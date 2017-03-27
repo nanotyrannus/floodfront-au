@@ -5,6 +5,7 @@ import { autoinject } from "aurelia-framework"
 import { MarkerModel, MarkerType } from "./MarkerModel"
 import { Marker } from "leaflet"
 import { MarkerNoteCustomElement } from "./marker-note/marker-note"
+import { NavigationService } from "../navigation/navigation-service"
 import { EventAggregator } from "aurelia-event-aggregator"
 
 @autoinject
@@ -16,20 +17,20 @@ export class LeafletMap {
     private markers: Marker[]
     private markersModels: MarkerModel[]
     private files: Map<any, File> = new Map<any, File>()
-    private nav: any = { currentPosition: {} }
 
     constructor(
         private router: Router,
-        private rest: RestService, 
-        private userService: UserService, 
+        private rest: RestService,
+        private userService: UserService,
         private markerNote: MarkerNoteCustomElement,
-        private eventAggregator: EventAggregator) {
+        private eventAggregator: EventAggregator,
+        private nav: NavigationService) {
 
         this.eventAggregator.subscribe("marker-note", data => {
             console.log(data)
             this.markersModels.forEach(markerModel => {
                 if (markerModel.id === data.id) {
-
+                    //TODO update descriptions client-side
                 }
             })
         })
@@ -79,23 +80,37 @@ export class LeafletMap {
             (layer as any).bringToFront()
         })
 
-        if (this.userService.mode === "desktop") {
-            matthewLayer.addTo(this.leafletMap)
-            // L.control.layers(null, { "Matthew": matthewLayer }).addTo(this.leafletMap)
-            L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/cj0kywrdm001n2smyhddxb7wb/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
-                // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                maxZoom: 19,
-                id: 'your.mapbox.project.id',
-                accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
-            }).addTo(this.leafletMap)
-        } else {
-            L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/ciye7ibx9000l2sk6v4n5bx3n/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
-                // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                maxZoom: 19,
-                id: 'your.mapbox.project.id',
-                accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
-            }).addTo(this.leafletMap)
+        // L.control.layers(null, { "Matthew": matthewLayer }).addTo(this.leafletMap)
+        let simpleLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/cj0kywrdm001n2smyhddxb7wb/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
+            // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 19,
+            id: 'your.mapbox.project.id',
+            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
+        })
+
+        let satelliteLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/ciye7ibx9000l2sk6v4n5bx3n/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
+            // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 19,
+            id: 'your.mapbox.project.id',
+            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
+        })
+
+        let baseMaps = {
+            "Simple" : simpleLayer,
+            "Satellite" : satelliteLayer 
         }
+
+        let overlayMaps = {
+            "Matthew" : matthewLayer
+        }
+        if (this.userService.mode === "desktop") { 
+            simpleLayer.addTo(this.leafletMap)
+            matthewLayer.addTo(this.leafletMap)
+        } else {
+            satelliteLayer.addTo(this.leafletMap)
+        }
+
+        L.control.layers(baseMaps, overlayMaps).addTo(this.leafletMap)
 
         // this.initiateNavigation
 
@@ -119,6 +134,8 @@ export class LeafletMap {
 
             // marker.addTo(this.leafletMap)
         })
+
+        this.centerMap()
     }
 
     private spawnMarker(latlng: any, type: MarkerType = null, oldMarker: any = null) {
@@ -341,12 +358,14 @@ export class LeafletMap {
     /**
      * Centers map on user location using GPS Navigation.
      */
-    private centerMap() {
+    private async centerMap() {
         // TODO r
-        this.leafletMap.setView([0, 0], 18)
+        let pos: any = await this.nav.getCurrentPosition()
+        console.log(pos)
+        this.leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 18)
     }
 
-
+    
 
 }
 
