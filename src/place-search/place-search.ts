@@ -7,7 +7,7 @@ export class PlaceSearch {
     
 
     // TODO change PlaceSearch to be server-sided. Must protect API key.
-    private baseUrl = "http://www.mapquestapi.com/geocoding/v1/address?key=Z8jOSw6nAVGVOhHv6A4TYlQ1ldWVlNuX&maxResults=10"
+    private baseUrl = "https://www.mapquestapi.com/geocoding/v1/address?key=Z8jOSw6nAVGVOhHv6A4TYlQ1ldWVlNuX&maxResults=10"
 
     constructor(private http: HttpClient) {
 
