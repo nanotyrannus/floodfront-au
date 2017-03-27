@@ -1,0 +1,14 @@
+.mode-title {
+    text-align: center;
+    color: white;
+    font-size: 3em;
+    margin: 5%;
+}
+
+.mode-button {
+    margin: 3%;
+    font-size: 5em;
+    text-align: center;
+    background-color: black;
+    color: white;
+}

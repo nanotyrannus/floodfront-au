@@ -1,0 +1,8 @@
+<template>
+    <require from="./marker-note.css"></require>
+    <div class="marker-note-container" class.bind="visible ? 'marker-visible' : 'marker-hidden'">
+        <textarea style="width: 100%; height: 80%;" value.bind="description"></textarea>
+        <button class="btn btn-primary" style="width: 49%" click.delegate="submit()">Submit</button>
+        <button class="btn btn-secondary" style="width: 49%" click.delegate="close()">Cancel</button>
+    </div>
+</template>

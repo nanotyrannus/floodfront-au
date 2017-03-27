@@ -1,0 +1,14 @@
+<template>
+    <require from="./mode-menu.css"></require>
+    <div>
+        <div class="mode-title">
+            <span>Logged in as ${ email }. Where are you?</span>
+        </div>
+        <div class="mode-button" click.delegate="enterMap('field')">
+            <span>Out in the Field</span>
+        </div>
+        <div class="mode-button" click.delegate="enterMap('desktop')">
+            <span>At a Desk</span>
+        </div>
+    </div>
+</template>

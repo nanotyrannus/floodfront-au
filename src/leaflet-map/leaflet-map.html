@@ -1,0 +1,28 @@
+<template>
+    <require from="leaflet/dist/leaflet.css"></require>
+    <require from="./marker-note/marker-note"></require>
+    <div class="map-context-menu">
+
+    </div>
+    <div class="map-button-container" style="bottom: 20px; right: 10px;">
+        <button class="map-button btn" click.delegate="primeMarker('WALKABLE')"><img src="/assets/images/marker_walkable.svg"></button>
+        <button class="map-button btn" click.delegate="primeMarker('BORDER')"><img src="/assets/images/marker_border.svg"></button>
+        <button class="map-button btn" click.delegate="primeMarker('FLOOD')"><img src="/assets/images/marker_flood.svg"></button>
+        <!--<button class="map-button btn" (click)="primeDirectionalMarker()"><span class="glyphicon glyphicon-repeat"></span></button>-->
+        <button class="map-button btn" (click)="toggleInfo()">
+            <img src="/assets/images/info.svg" style="width: 100%;">
+        </button>
+    </div>
+    <div class="map-button-container" style="bottom: 20px; left: 10px;">
+        <button class="map-button btn" click.delegate="goBack()">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </button>
+    </div>
+    <div class="map-button-container" style="bottom: 12%; right: 10px;">
+        <button class="map-button btn" click.delegate="centerMap()"><img src="/assets/images/crosshair.svg"></button>
+    </div>
+    <div id="map"></div>
+    <popup [x]='clickX' [y]='clickY'></popup>
+    <marker-menu (onMarkerPicked)="onMarkerPicked($event)"></marker-menu>
+    <marker-note></marker-note>
+</template>
