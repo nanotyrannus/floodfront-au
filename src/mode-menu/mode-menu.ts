@@ -14,4 +14,8 @@ export class ModeMenu {
         this.userService.mode = mode
         this.router.navigate("map")
     }
+
+    private logout() {
+        this.userService.logout()
+    }
 }

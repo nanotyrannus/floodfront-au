@@ -1,0 +1,13 @@
+.place-search-input-container {
+    position: fixed;
+    top: 3%;
+    left: 3%;
+    padding: 1%;
+    z-index: 400;
+    background-color: white;
+    opacity: 0.3;
+}
+
+.place-search-input-container:hover {
+    opacity: 1.0;
+}

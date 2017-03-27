@@ -72,77 +72,6 @@ define('cookie/cookie-service',["require", "exports", "js-cookie"], function (re
     exports.CookieService = CookieService;
 });
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('login/login',["require", "exports", "aurelia-router", "aurelia-framework", "../user/user-service"], function (require, exports, aurelia_router_1, aurelia_framework_1, user_service_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Login = (function () {
-        function Login(router, userService) {
-            this.router = router;
-            this.userService = userService;
-            this.email = "";
-        }
-        Login.prototype.login = function (event) {
-            if (this.email === "") {
-                console.warn("Empty email field.");
-                return;
-            }
-            if (event.type === "click" || event.which === 13) {
-                console.log("email entered: " + this.email);
-                this.userService.login(this.email);
-            }
-            event.preventDefault();
-        };
-        Login.prototype.submit = function () {
-        };
-        return Login;
-    }());
-    Login = __decorate([
-        aurelia_framework_1.inject(aurelia_router_1.Router, user_service_1.UserService),
-        __metadata("design:paramtypes", [aurelia_router_1.Router, user_service_1.UserService])
-    ], Login);
-    exports.Login = Login;
-});
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('mode-menu/mode-menu',["require", "exports", "../user/user-service", "aurelia-router", "aurelia-framework"], function (require, exports, user_service_1, aurelia_router_1, aurelia_framework_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ModeMenu = (function () {
-        function ModeMenu(userService, router) {
-            this.userService = userService;
-            this.router = router;
-            this.email = userService.email;
-        }
-        ModeMenu.prototype.enterMap = function (mode) {
-            this.userService.mode = mode;
-            this.router.navigate("map");
-        };
-        return ModeMenu;
-    }());
-    ModeMenu = __decorate([
-        aurelia_framework_1.autoinject(),
-        __metadata("design:paramtypes", [user_service_1.UserService, aurelia_router_1.Router])
-    ], ModeMenu);
-    exports.ModeMenu = ModeMenu;
-});
-
 define('leaflet-map/MarkerModel',["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -208,11 +137,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../rest/rest-service", "../user/user-service", "aurelia-framework", "./MarkerModel", "leaflet", "./marker-note/marker-note", "../navigation/navigation-service", "aurelia-event-aggregator"], function (require, exports, aurelia_router_1, rest_service_1, user_service_1, aurelia_framework_1, MarkerModel_1, leaflet_1, marker_note_1, navigation_service_1, aurelia_event_aggregator_1) {
+define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../rest/rest-service", "../user/user-service", "aurelia-framework", "./MarkerModel", "leaflet", "./marker-note/marker-note", "../navigation/navigation-service", "aurelia-event-aggregator", "../place-search/place-search"], function (require, exports, aurelia_router_1, rest_service_1, user_service_1, aurelia_framework_1, MarkerModel_1, leaflet_1, marker_note_1, navigation_service_1, aurelia_event_aggregator_1, place_search_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var LeafletMap = (function () {
-        function LeafletMap(router, rest, userService, markerNote, eventAggregator, nav) {
+        function LeafletMap(router, rest, userService, markerNote, eventAggregator, nav, search) {
             var _this = this;
             this.router = router;
             this.rest = rest;
@@ -220,6 +149,7 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
             this.markerNote = markerNote;
             this.eventAggregator = eventAggregator;
             this.nav = nav;
+            this.search = search;
             this.primed = false;
             this.files = new Map();
             this.eventAggregator.subscribe("marker-note", function (data) {
@@ -381,7 +311,7 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
             marker.addTo(this.leafletMap);
         };
         LeafletMap.prototype.goBack = function () {
-            this.router.navigate("");
+            this.router.navigate("mode");
         };
         LeafletMap.prototype.getMarkers = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -444,10 +374,14 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
             var markup = "\n        <img id=\"thumbnail-" + marker.id + "\" class=\"thumbnail map-thumbnail\" src=\"/uploads/" + marker.id + ".jpg\">\n        <form enctype=\"multipart/form-data\" action=\"https://localhost:8080/upload\" method=\"POST\">\n        <input style=\"display: inline;\" class=\"filestyle\" data-iconName=\"glyphicon glyphicon-camera\" type=\"file\" name=\"picture\" accept=\"image/*\" onchange=\"window.leafletComponent.readUrl(this, " + marker.id + ")\">\n        </form>\n        <button class=\"btn btn-default context-btn\" onclick=\"window.leafletComponent.openNote()\">Note</button>\n        <button class=\"btn btn-default context-btn\" onclick=\"window.leafletComponent.deleteMarker()\">Delete</button>\n        <!-- <button class=\"btn btn-default\" onclick=\"window.leafletComponent.upload(" + marker.id + ")\">UPLOAD</button> -->\n    ";
             marker.bindPopup(markup, { "autoPan": false });
         };
-        LeafletMap.prototype.updateMarker = function (val0, val1) {
-            return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
-                return [2 /*return*/];
-            }); });
+        LeafletMap.prototype.updateMarker = function (id, latlng, heading) {
+            if (heading === void 0) { heading = null; }
+            console.log("updateMarker called with " + id + " " + heading, latlng);
+            this.rest.postWithRetry("/marker/" + id + "/update", {
+                "lat": latlng.lat,
+                "lon": latlng.lng,
+                "heading": heading
+            });
         };
         LeafletMap.prototype.deleteMarker = function (marker) {
             return __awaiter(this, void 0, void 0, function () {
@@ -501,6 +435,24 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
                 });
             });
         };
+        LeafletMap.prototype.query = function (event) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!(event.which === 13)) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.search.search(this.placeQuery)];
+                        case 1:
+                            result = _a.sent();
+                            this.placeQuery = "";
+                            this.leafletMap.setView(result[0].latLng, 15);
+                            _a.label = 2;
+                        case 2: return [2 /*return*/];
+                    }
+                });
+            });
+        };
         return LeafletMap;
     }());
     LeafletMap = __decorate([
@@ -510,7 +462,8 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
             user_service_1.UserService,
             marker_note_1.MarkerNoteCustomElement,
             aurelia_event_aggregator_1.EventAggregator,
-            navigation_service_1.NavigationService])
+            navigation_service_1.NavigationService,
+            place_search_1.PlaceSearch])
     ], LeafletMap);
     exports.LeafletMap = LeafletMap;
     var DataMarker = (function (_super) {
@@ -520,6 +473,190 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
         }
         return DataMarker;
     }(leaflet_1.Marker));
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('login/login',["require", "exports", "aurelia-router", "aurelia-framework", "../user/user-service"], function (require, exports, aurelia_router_1, aurelia_framework_1, user_service_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Login = (function () {
+        function Login(router, userService) {
+            this.router = router;
+            this.userService = userService;
+            this.email = "";
+        }
+        Login.prototype.login = function (event) {
+            if (this.email === "") {
+                console.warn("Empty email field.");
+                return;
+            }
+            if (event.type === "click" || event.which === 13) {
+                console.log("email entered: " + this.email);
+                this.userService.login(this.email);
+            }
+            event.preventDefault();
+        };
+        Login.prototype.submit = function () {
+        };
+        return Login;
+    }());
+    Login = __decorate([
+        aurelia_framework_1.inject(aurelia_router_1.Router, user_service_1.UserService),
+        __metadata("design:paramtypes", [aurelia_router_1.Router, user_service_1.UserService])
+    ], Login);
+    exports.Login = Login;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('mode-menu/mode-menu',["require", "exports", "../user/user-service", "aurelia-router", "aurelia-framework"], function (require, exports, user_service_1, aurelia_router_1, aurelia_framework_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ModeMenu = (function () {
+        function ModeMenu(userService, router) {
+            this.userService = userService;
+            this.router = router;
+            this.email = userService.email;
+        }
+        ModeMenu.prototype.enterMap = function (mode) {
+            this.userService.mode = mode;
+            this.router.navigate("map");
+        };
+        ModeMenu.prototype.logout = function () {
+            this.userService.logout();
+        };
+        return ModeMenu;
+    }());
+    ModeMenu = __decorate([
+        aurelia_framework_1.autoinject(),
+        __metadata("design:paramtypes", [user_service_1.UserService, aurelia_router_1.Router])
+    ], ModeMenu);
+    exports.ModeMenu = ModeMenu;
+});
+
+define('navigation/navigation-service',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var NavigationService = (function () {
+        function NavigationService() {
+            this.currentPosition = {
+                accuracy: -1,
+                lat: -1,
+                lon: -1
+            };
+        }
+        NavigationService.prototype.initialize = function () {
+            var _this = this;
+            this.watchId = window.navigator.geolocation.watchPosition(function (pos) {
+                _this.currentPosition = {
+                    lat: pos.coords.latitude,
+                    lon: pos.coords.longitude,
+                    accuracy: pos.coords.accuracy
+                };
+            });
+        };
+        NavigationService.prototype.getCurrentPosition = function () {
+            var options = {
+                "enableHighAccuracy": true
+            };
+            return new Promise(function (resolve, reject) {
+                window.navigator.geolocation.getCurrentPosition(resolve, reject, options);
+            });
+        };
+        return NavigationService;
+    }());
+    exports.NavigationService = NavigationService;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t;
+    return { next: verb(0), "throw": verb(1), "return": verb(2) };
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+define('place-search/place-search',["require", "exports", "aurelia-http-client", "aurelia-framework"], function (require, exports, aurelia_http_client_1, aurelia_framework_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var PlaceSearch = (function () {
+        function PlaceSearch(http) {
+            this.http = http;
+            this.baseUrl = "http://www.mapquestapi.com/geocoding/v1/address?key=Z8jOSw6nAVGVOhHv6A4TYlQ1ldWVlNuX&maxResults=10";
+        }
+        PlaceSearch.prototype.search = function (place) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result, response, locations;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.http.get(this.baseUrl + "&location=" + place)];
+                        case 1:
+                            result = _a.sent();
+                            response = JSON.parse(result.response);
+                            locations = response.results[0].locations;
+                            return [2 /*return*/, locations];
+                    }
+                });
+            });
+        };
+        return PlaceSearch;
+    }());
+    PlaceSearch = __decorate([
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [aurelia_http_client_1.HttpClient])
+    ], PlaceSearch);
+    exports.PlaceSearch = PlaceSearch;
 });
 
 define('resources/index',["require", "exports"], function (require, exports) {
@@ -834,48 +971,16 @@ define('leaflet-map/marker-note/marker-note',["require", "exports", "aurelia-eve
     exports.MarkerNoteCustomElement = MarkerNoteCustomElement;
 });
 
-define('navigation/navigation-service',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var NavigationService = (function () {
-        function NavigationService() {
-            this.currentPosition = {
-                accuracy: -1,
-                lat: -1,
-                lon: -1
-            };
-        }
-        NavigationService.prototype.initialize = function () {
-            var _this = this;
-            this.watchId = window.navigator.geolocation.watchPosition(function (pos) {
-                _this.currentPosition = {
-                    lat: pos.coords.latitude,
-                    lon: pos.coords.longitude,
-                    accuracy: pos.coords.accuracy
-                };
-            });
-        };
-        NavigationService.prototype.getCurrentPosition = function () {
-            var options = {
-                "enableHighAccuracy": true
-            };
-            return new Promise(function (resolve, reject) {
-                window.navigator.geolocation.getCurrentPosition(resolve, reject, options);
-            });
-        };
-        return NavigationService;
-    }());
-    exports.NavigationService = NavigationService;
-});
-
 define('text!app.html', ['module'], function(module) { module.exports = "<template><require from=\"styles.css\"></require><router-view></router-view></template>"; });
 define('text!styles.css', ['module'], function(module) { module.exports = "body, html {\n    width: 100%;\n    height: 100%;\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n\n\nbackground: #4b6cb7; /* fallback for old browsers */\nbackground: -webkit-linear-gradient(to left, #4b6cb7 , #182848); /* Chrome 10-25, Safari 5.1-6 */\nbackground: linear-gradient(to left, #4b6cb7 , #182848); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */\n        \n}\n\n@media (max-width: 400) {\n    span.login-title {\n        font-size: 3em;\n    }\n}\n\n@media (max-width: 800) {\n    span.login-title {\n        font-size: 5em;\n    }\n}\n\n#map {\n    width: 100%;\n    height: 100%;\n}\n\n/* Overriding leaflet class */\n.leaflet-control-zoom {\n    position: fixed !important;\n    bottom: 20%;\n    right: 3%;\n}\n\n.map-button {\n    height: 3em;\n    width: 3em;\n    background-color: #02a4d3;\n    color: #FFFFFF;\n    border: none;\n    background-color: #d3d3d3;\n}\n\n.context-btn {\n    margin-bottom: 1em !important;\n    width: 100%;\n}\n\n.map-button:active {\n    background-color: #FFFFFF;\n    color: #02a4d3;\n}\n\n.map-button-container {\n    z-index: 401;\n    position: absolute;\n    /*bottom: 20px;\n    right: 10px;*/\n}\n\n.map-thumbnail {\n    width: 200px;\n    height: 200px;\n}\n\n.marker-menu-button {\n    color: white;\n    background-color: #4c97ba;\n    display: table;\n    width: 100%;\n    height: 22%;\n    margin: 2%;\n}\n\n.marker-note-container {\n    z-index: 402;\n    width: 80%;\n    height: 50%;\n    position: fixed;\n    background-color: white;\n    right: 0;\n    left: 0;\n    top: 25%;\n    margin-right: auto;\n    margin-left: auto;\n    padding: 1%;\n}\n\n.marker-menu-text {\n    display: table-cell;\n    align-items: center;\n}\n\n.marker-menu-container {\n    position: fixed;\n    background-color: white;\n    right: 0;\n    left: 0;\n    top: 40%;\n    margin-right: auto;\n    margin-left: auto;\n    width: 75%;\n    height: 30%;\n    z-index:402;\n    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);\n    padding: 5%;\n}\n\n\n\n.login-container {}\n\n.vertical-center {\n  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */\n  min-height: 100vh; /* These two lines are counted as one :-)       */\n\n  display: flex;\n  align-items: center;\n}\n\n.footer {\n    box-sizing: border-box;\n    color: rgb(100%, 100%, 100%);\n    width: 100%;\n    height: 10%;\n    background-color: rgb(20.2%, 20.2%, 20.2%);\n}\n\n.link:link {\n    text-decoration: none;\n}\n\n.link:hover {\n    text-decoration: none;\n}\n\n/* CSS Spinner */\n.loader {\n  font-size: 10px;\n  margin: 50px auto;\n  text-indent: -9999em;\n  width: 11em;\n  height: 11em;\n  border-radius: 50%;\n  background: #ffffff;\n  background: -moz-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);\n  background: -webkit-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);\n  background: -o-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);\n  background: -ms-linear-gradient(left, #ffffff 10%, rgba(255, 255, 255, 0) 42%);\n  background: linear-gradient(to right, #ffffff 10%, rgba(255, 255, 255, 0) 42%);\n  position: relative;\n  -webkit-animation: load3 1.4s infinite linear;\n  animation: load3 1.4s infinite linear;\n  -webkit-transform: translateZ(0);\n  -ms-transform: translateZ(0);\n  transform: translateZ(0);\n}\n.loader:before {\n  width: 50%;\n  height: 50%;\n  background: #ffffff;\n  border-radius: 100% 0 0 0;\n  position: absolute;\n  top: 0;\n  left: 0;\n  content: '';\n}\n.loader:after {\n  background: #4b6cb7;\n  width: 75%;\n  height: 75%;\n  border-radius: 50%;\n  content: '';\n  margin: auto;\n  position: absolute;\n  top: 0;\n  left: 0;\n  bottom: 0;\n  right: 0;\n}\n@-webkit-keyframes load3 {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n@keyframes load3 {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(360deg);\n    transform: rotate(360deg);\n  }\n}\n\n/* CSS Spinner END*/\n\n.slider-container {\n    position: fixed;\n    top: 100px;\n    left: 100px;\n    z-index: 400;\n}\n\n.jcs-value {\n    display: none;\n}"; });
-define('text!leaflet-map/leaflet-map.css', ['module'], function(module) { module.exports = ""; });
-define('text!leaflet-map/leaflet-map.html', ['module'], function(module) { module.exports = "<template><require from=\"leaflet/dist/leaflet.css\"></require><require from=\"./marker-note/marker-note\"></require><div class=\"map-context-menu\"></div><div class=\"map-button-container\" style=\"bottom:20px;right:10px\"><button class=\"map-button btn\" click.delegate=\"primeMarker('WALKABLE')\"><img src=\"/assets/images/marker_walkable.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('BORDER')\"><img src=\"/assets/images/marker_border.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('FLOOD')\"><img src=\"/assets/images/marker_flood.svg\"></button> <button class=\"map-button btn\" (click)=\"toggleInfo()\"><img src=\"/assets/images/info.svg\" style=\"width:100%\"></button></div><div class=\"map-button-container\" style=\"bottom:20px;left:10px\"><button class=\"map-button btn\" click.delegate=\"goBack()\"><span class=\"glyphicon glyphicon-chevron-left\"></span></button></div><div class=\"map-button-container\" style=\"bottom:12%;right:10px\"><button class=\"map-button btn\" click.delegate=\"centerMap()\"><img src=\"/assets/images/crosshair.svg\"></button></div><div id=\"map\"></div><popup [x]=\"clickX\" [y]=\"clickY\"></popup><marker-menu (onmarkerpicked)=\"onMarkerPicked($event)\"></marker-menu><marker-note></marker-note></template>"; });
-define('text!login/login.css', ['module'], function(module) { module.exports = "input[type=\"text\"] {\n    font-size: 2em;\n}\n\n.login-title {\n    color: white;\n    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);\n    font-size: 3em;\n}\n\n.login-component-container {\n    box-sizing: border-box;\n    width: 100%;\n    height: 100%;\n    /*background-image: url('/assets/images/albert st brisbane.jpg');*/\n    /*background-size: cover;*/\n}\n\n.logo {\n    width: 20%;\n    margin-left: 3%;\n    margin-right: 3%;\n    /*height: 250px;*/\n}"; });
+define('text!leaflet-map/leaflet-map.html', ['module'], function(module) { module.exports = "<template><require from=\"leaflet/dist/leaflet.css\"></require><require from=\"./marker-note/marker-note\"></require><require from=\"./leaflet-map.css\"></require><div class=\"map-context-menu\"></div><div class=\"map-button-container\" style=\"bottom:20px;right:10px\"><button class=\"map-button btn\" click.delegate=\"primeMarker('WALKABLE')\"><img src=\"/assets/images/marker_walkable.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('BORDER')\"><img src=\"/assets/images/marker_border.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('FLOOD')\"><img src=\"/assets/images/marker_flood.svg\"></button> <button class=\"map-button btn\" (click)=\"toggleInfo()\"><img src=\"/assets/images/info.svg\" style=\"width:100%\"></button></div><div class=\"map-button-container\" style=\"bottom:20px;left:10px\"><button class=\"map-button btn\" click.delegate=\"goBack()\"><span class=\"glyphicon glyphicon-chevron-left\"></span></button></div><div class=\"map-button-container\" style=\"bottom:12%;right:10px\"><button class=\"map-button btn\" click.delegate=\"centerMap()\"><img src=\"/assets/images/crosshair.svg\"></button></div><div id=\"map\"></div><popup [x]=\"clickX\" [y]=\"clickY\"></popup><marker-menu (onmarkerpicked)=\"onMarkerPicked($event)\"></marker-menu><marker-note></marker-note><div class=\"place-search-input-container\"><input type=\"text\" value.bind=\"placeQuery\" keyup.delegate=\"query($event)\" placeholder=\"Search...\"></div></template>"; });
+define('text!leaflet-map/leaflet-map.css', ['module'], function(module) { module.exports = ".place-search-input-container {\n    position: fixed;\n    top: 3%;\n    left: 3%;\n    padding: 1%;\n    z-index: 400;\n    background-color: white;\n    opacity: 0.3;\n}\n\n.place-search-input-container:hover {\n    opacity: 1.0;\n}"; });
 define('text!login/login.html', ['module'], function(module) { module.exports = "<template><require from=\"login/login.css\"></require><div class=\"login-component-container vertical-center container\"><div class=\"container\"><div class=\"row\"><div class=\"col-md-12 col-xs-12 col-lg-12\"><div style=\"justify-content:center;display:flex;align-items:center;margin-top:10%\"><img src=\"assets/images/marker_walkable.svg\" class=\"logo\"> <img src=\"assets/images/marker_border.svg\" class=\"logo\"> <img src=\"assets/images/marker_flood.svg\" class=\"logo\"></div><div class=\"text-center\"><span class=\"login-title text-center\">Flood Front</span></div></div></div><div class=\"row\"><div class=\"col-md-12 col-sm-12 col-xs-12\"><div class=\"login-container\" style=\"width:100%\"><div class=\"input-group\" style=\"width:75%;margin:0 auto\"><span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-envelope\"></span> </span><input type=\"text\" keyup.delegate=\"login($event)\" class=\"form-control\" placeholder=\"Email\" value.bind=\"email\"> <span class=\"input-group-btn\"><button class=\"btn btn-default\" disabled.bind=\"email.length < 1\" click.delegate=\"login($event)\">ENTER</button></span></div></div></div></div></div></div></template>"; });
+define('text!login/login.css', ['module'], function(module) { module.exports = "input[type=\"text\"] {\n    font-size: 2em;\n}\n\n.login-title {\n    color: white;\n    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);\n    font-size: 3em;\n}\n\n.login-component-container {\n    box-sizing: border-box;\n    width: 100%;\n    height: 100%;\n    /*background-image: url('/assets/images/albert st brisbane.jpg');*/\n    /*background-size: cover;*/\n}\n\n.logo {\n    width: 20%;\n    margin-left: 3%;\n    margin-right: 3%;\n    /*height: 250px;*/\n}"; });
+define('text!mode-menu/mode-menu.html', ['module'], function(module) { module.exports = "<template><require from=\"./mode-menu.css\"></require><div><div class=\"mode-title\"><span>Logged in as ${ email }. Where are you?</span></div><div class=\"mode-button\" click.delegate=\"enterMap('field')\"><span>Out in the Field</span></div><div class=\"mode-button\" click.delegate=\"enterMap('desktop')\"><span>At a Desk</span></div><div class=\"mode-button\" click.delegate=\"logout()\"><span>Leaving (Log out)</span></div></div></template>"; });
 define('text!mode-menu/mode-menu.css', ['module'], function(module) { module.exports = ".mode-title {\n    text-align: center;\n    color: white;\n    font-size: 3em;\n    margin: 5%;\n}\n\n.mode-button {\n    margin: 3%;\n    font-size: 5em;\n    text-align: center;\n    background-color: black;\n    color: white;\n}"; });
-define('text!mode-menu/mode-menu.html', ['module'], function(module) { module.exports = "<template><require from=\"./mode-menu.css\"></require><div><div class=\"mode-title\"><span>Logged in as ${ email }. Where are you?</span></div><div class=\"mode-button\" click.delegate=\"enterMap('field')\"><span>Out in the Field</span></div><div class=\"mode-button\" click.delegate=\"enterMap('desktop')\"><span>At a Desk</span></div></div></template>"; });
-define('text!leaflet-map/marker-note/marker-note.css', ['module'], function(module) { module.exports = ".marker-hidden {\n    display: none;\n}\n\n.marker-visible {\n    display: block;\n}"; });
+define('text!place-search/place-search.html', ['module'], function(module) { module.exports = "<template><require from=\"./place-search.css\"></require></template>"; });
+define('text!place-search/place-search.css', ['module'], function(module) { module.exports = ""; });
 define('text!leaflet-map/marker-note/marker-note.html', ['module'], function(module) { module.exports = "<template><require from=\"./marker-note.css\"></require><div class=\"marker-note-container\" class.bind=\"visible ? 'marker-visible' : 'marker-hidden'\"><textarea style=\"width:100%;height:80%\" value.bind=\"description\"></textarea><button class=\"btn btn-primary\" style=\"width:49%\" click.delegate=\"submit()\">Submit</button> <button class=\"btn btn-secondary\" style=\"width:49%\" click.delegate=\"close()\">Cancel</button></div></template>"; });
+define('text!leaflet-map/marker-note/marker-note.css', ['module'], function(module) { module.exports = ".marker-hidden {\n    display: none;\n}\n\n.marker-visible {\n    display: block;\n}"; });
 //# sourceMappingURL=app-bundle.js.map

@@ -7,6 +7,7 @@ import { Marker } from "leaflet"
 import { MarkerNoteCustomElement } from "./marker-note/marker-note"
 import { NavigationService } from "../navigation/navigation-service"
 import { EventAggregator } from "aurelia-event-aggregator"
+import { PlaceSearch } from "../place-search/place-search"
 
 @autoinject
 export class LeafletMap {
@@ -17,6 +18,7 @@ export class LeafletMap {
     private markers: Marker[]
     private markersModels: MarkerModel[]
     private files: Map<any, File> = new Map<any, File>()
+    private placeQuery: string
 
     constructor(
         private router: Router,
@@ -24,7 +26,8 @@ export class LeafletMap {
         private userService: UserService,
         private markerNote: MarkerNoteCustomElement,
         private eventAggregator: EventAggregator,
-        private nav: NavigationService) {
+        private nav: NavigationService,
+        private search: PlaceSearch) {
 
         this.eventAggregator.subscribe("marker-note", data => {
             console.log(data)
@@ -96,14 +99,14 @@ export class LeafletMap {
         })
 
         let baseMaps = {
-            "Simple" : simpleLayer,
-            "Satellite" : satelliteLayer 
+            "Simple": simpleLayer,
+            "Satellite": satelliteLayer
         }
 
         let overlayMaps = {
-            "Matthew" : matthewLayer
+            "Matthew": matthewLayer
         }
-        if (this.userService.mode === "desktop") { 
+        if (this.userService.mode === "desktop") {
             simpleLayer.addTo(this.leafletMap)
             matthewLayer.addTo(this.leafletMap)
         } else {
@@ -262,7 +265,7 @@ export class LeafletMap {
     }
 
     goBack() {
-        this.router.navigate("")
+        this.router.navigate("mode")
     }
 
     private async getMarkers() {
@@ -319,7 +322,14 @@ export class LeafletMap {
         marker.bindPopup(markup, { "autoPan": false })
     }
 
-    private async updateMarker(val0: any, val1: any) { }
+    public updateMarker(id: number, latlng: any, heading: number = null) {
+        console.log(`updateMarker called with ${id} ${heading}`, latlng)
+        this.rest.postWithRetry(`/marker/${id}/update`, {
+            "lat": latlng.lat,
+            "lon": latlng.lng,
+            "heading": heading
+        })
+    }
 
     private async deleteMarker(marker: Marker) {
         let res = window.confirm("Delete marker?")
@@ -365,7 +375,14 @@ export class LeafletMap {
         this.leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 18)
     }
 
-    
+    private async query(event: KeyboardEvent) {
+        // For now, navigate to first result.
+        if (event.which === 13) {
+            let result = await this.search.search(this.placeQuery)
+            this.placeQuery = ""
+            this.leafletMap.setView(result[0].latLng, 15)
+        }
+    }
 
 }
 
