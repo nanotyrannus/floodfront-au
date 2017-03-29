@@ -157,7 +157,15 @@
             "resources": []
           },
           "js-cookie",
-          "bootstrap-filestyle"
+          "bootstrap-filestyle",
+          {
+            "name": "please-wait",
+            "main": "build/please-wait.js",
+            "path": "../node_modules/please-wait",
+            "resources": [
+              "build/please-wait.css"
+            ]
+          }
         ]
       }
     ]
