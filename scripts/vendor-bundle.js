@@ -52221,4 +52221,299 @@ define('aurelia-http-client/aurelia-http-client',['exports', 'aurelia-path', 'au
 
 define("bootstrap-filestyle", [],function(){});
 
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules/aurelia-binding/dist/amd/aurelia-binding","aurelia-bootstrapper":"../node_modules/aurelia-bootstrapper/dist/amd/aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules/aurelia-dependency-injection/dist/amd/aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules/aurelia-event-aggregator/dist/amd/aurelia-event-aggregator","aurelia-framework":"../node_modules/aurelia-framework/dist/amd/aurelia-framework","aurelia-history":"../node_modules/aurelia-history/dist/amd/aurelia-history","aurelia-history-browser":"../node_modules/aurelia-history-browser/dist/amd/aurelia-history-browser","aurelia-loader":"../node_modules/aurelia-loader/dist/amd/aurelia-loader","aurelia-loader-default":"../node_modules/aurelia-loader-default/dist/amd/aurelia-loader-default","aurelia-logging":"../node_modules/aurelia-logging/dist/amd/aurelia-logging","aurelia-logging-console":"../node_modules/aurelia-logging-console/dist/amd/aurelia-logging-console","aurelia-metadata":"../node_modules/aurelia-metadata/dist/amd/aurelia-metadata","aurelia-pal":"../node_modules/aurelia-pal/dist/amd/aurelia-pal","aurelia-pal-browser":"../node_modules/aurelia-pal-browser/dist/amd/aurelia-pal-browser","aurelia-path":"../node_modules/aurelia-path/dist/amd/aurelia-path","aurelia-polyfills":"../node_modules/aurelia-polyfills/dist/amd/aurelia-polyfills","aurelia-route-recognizer":"../node_modules/aurelia-route-recognizer/dist/amd/aurelia-route-recognizer","aurelia-task-queue":"../node_modules/aurelia-task-queue/dist/amd/aurelia-task-queue","aurelia-router":"../node_modules/aurelia-router/dist/amd/aurelia-router","aurelia-templating":"../node_modules/aurelia-templating/dist/amd/aurelia-templating","aurelia-templating-binding":"../node_modules/aurelia-templating-binding/dist/amd/aurelia-templating-binding","text":"../node_modules/text/text","jquery":"../node_modules/jquery/dist/jquery","js-cookie":"../node_modules/js-cookie/src/js.cookie","bootstrap-filestyle":"../node_modules/bootstrap-filestyle/src/bootstrap-filestyle","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"leaflet","location":"../node_modules/leaflet","main":"dist/leaflet-src.js"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["app","environment","main","cookie/cookie-service","leaflet-map/MarkerModel","leaflet-map/leaflet-map","login/login","mode-menu/mode-menu","navigation/navigation-service","place-search/place-search","resources/index","rest/rest-service","user/user-service","leaflet-map/marker-note/marker-note","styles"]}})}
+/**
+* please-wait
+* Display a nice loading screen while your app loads
+
+* @author Pathgather <tech@pathgather.com>
+* @copyright Pathgather 2015
+* @license MIT <http://opensource.org/licenses/mit-license.php>
+* @link https://github.com/Pathgather/please-wait
+* @module please-wait
+* @version 0.0.5
+*/
+(function(root, factory) {
+  if (typeof exports === "object") {
+    factory(exports);
+  } else if (typeof define === "function" && define.amd) {
+    define('please-wait/build/please-wait',["exports"], factory);
+  } else {
+    factory(root);
+  }
+})(this, function(exports) {
+  var PleaseWait, addClass, animationEvent, animationSupport, domPrefixes, elm, key, pfx, pleaseWait, removeClass, transEndEventNames, transitionEvent, transitionSupport, val, _i, _len;
+  elm = document.createElement('fakeelement');
+  animationSupport = false;
+  transitionSupport = false;
+  animationEvent = 'animationend';
+  transitionEvent = null;
+  domPrefixes = 'Webkit Moz O ms'.split(' ');
+  transEndEventNames = {
+    'WebkitTransition': 'webkitTransitionEnd',
+    'MozTransition': 'transitionend',
+    'OTransition': 'oTransitionEnd',
+    'msTransition': 'MSTransitionEnd',
+    'transition': 'transitionend'
+  };
+  for (key in transEndEventNames) {
+    val = transEndEventNames[key];
+    if (elm.style[key] != null) {
+      transitionEvent = val;
+      transitionSupport = true;
+      break;
+    }
+  }
+  if (elm.style.animationName != null) {
+    animationSupport = true;
+  }
+  if (!animationSupport) {
+    for (_i = 0, _len = domPrefixes.length; _i < _len; _i++) {
+      pfx = domPrefixes[_i];
+      if (elm.style["" + pfx + "AnimationName"] != null) {
+        switch (pfx) {
+          case 'Webkit':
+            animationEvent = 'webkitAnimationEnd';
+            break;
+          case 'Moz':
+            animationEvent = 'animationend';
+            break;
+          case 'O':
+            animationEvent = 'oanimationend';
+            break;
+          case 'ms':
+            animationEvent = 'MSAnimationEnd';
+        }
+        animationSupport = true;
+        break;
+      }
+    }
+  }
+  addClass = function(classname, elem) {
+    if (elem.classList) {
+      return elem.classList.add(classname);
+    } else {
+      return elem.className += " " + classname;
+    }
+  };
+  removeClass = function(classname, elem) {
+    if (elem.classList) {
+      return elem.classList.remove(classname);
+    } else {
+      return elem.className = elem.className.replace(classname, "").trim();
+    }
+  };
+  PleaseWait = (function() {
+    PleaseWait._defaultOptions = {
+      backgroundColor: null,
+      logo: null,
+      loadingHtml: null,
+      template: "<div class='pg-loading-inner'>\n  <div class='pg-loading-center-outer'>\n    <div class='pg-loading-center-middle'>\n      <h1 class='pg-loading-logo-header'>\n        <img class='pg-loading-logo'></img>\n      </h1>\n      <div class='pg-loading-html'>\n      </div>\n    </div>\n  </div>\n</div>",
+      onLoadedCallback: null
+    };
+
+    function PleaseWait(options) {
+      var defaultOptions, k, listener, v;
+      defaultOptions = this.constructor._defaultOptions;
+      this.options = {};
+      this.loaded = false;
+      this.finishing = false;
+      for (k in defaultOptions) {
+        v = defaultOptions[k];
+        this.options[k] = options[k] != null ? options[k] : v;
+      }
+      this._loadingElem = document.createElement("div");
+      this._loadingHtmlToDisplay = [];
+      this._loadingElem.className = "pg-loading-screen";
+      if (this.options.backgroundColor != null) {
+        this._loadingElem.style.backgroundColor = this.options.backgroundColor;
+      }
+      this._loadingElem.innerHTML = this.options.template;
+      this._loadingHtmlElem = this._loadingElem.getElementsByClassName("pg-loading-html")[0];
+      if (this._loadingHtmlElem != null) {
+        this._loadingHtmlElem.innerHTML = this.options.loadingHtml;
+      }
+      this._readyToShowLoadingHtml = false;
+      this._logoElem = this._loadingElem.getElementsByClassName("pg-loading-logo")[0];
+      if (this._logoElem != null) {
+        this._logoElem.src = this.options.logo;
+      }
+      removeClass("pg-loaded", document.body);
+      addClass("pg-loading", document.body);
+      document.body.appendChild(this._loadingElem);
+      addClass("pg-loading", this._loadingElem);
+      this._onLoadedCallback = this.options.onLoadedCallback;
+      listener = (function(_this) {
+        return function(evt) {
+          _this.loaded = true;
+          _this._readyToShowLoadingHtml = true;
+          addClass("pg-loaded", _this._loadingHtmlElem);
+          if (animationSupport) {
+            _this._loadingHtmlElem.removeEventListener(animationEvent, listener);
+          }
+          if (_this._loadingHtmlToDisplay.length > 0) {
+            _this._changeLoadingHtml();
+          }
+          if (_this.finishing) {
+            if (evt != null) {
+              evt.stopPropagation();
+            }
+            return _this._finish();
+          }
+        };
+      })(this);
+      if (this._loadingHtmlElem != null) {
+        if (animationSupport) {
+          this._loadingHtmlElem.addEventListener(animationEvent, listener);
+        } else {
+          listener();
+        }
+        this._loadingHtmlListener = (function(_this) {
+          return function() {
+            _this._readyToShowLoadingHtml = true;
+            removeClass("pg-loading", _this._loadingHtmlElem);
+            if (transitionSupport) {
+              _this._loadingHtmlElem.removeEventListener(transitionEvent, _this._loadingHtmlListener);
+            }
+            if (_this._loadingHtmlToDisplay.length > 0) {
+              return _this._changeLoadingHtml();
+            }
+          };
+        })(this);
+        this._removingHtmlListener = (function(_this) {
+          return function() {
+            _this._loadingHtmlElem.innerHTML = _this._loadingHtmlToDisplay.shift();
+            removeClass("pg-removing", _this._loadingHtmlElem);
+            addClass("pg-loading", _this._loadingHtmlElem);
+            if (transitionSupport) {
+              _this._loadingHtmlElem.removeEventListener(transitionEvent, _this._removingHtmlListener);
+              return _this._loadingHtmlElem.addEventListener(transitionEvent, _this._loadingHtmlListener);
+            } else {
+              return _this._loadingHtmlListener();
+            }
+          };
+        })(this);
+      }
+    }
+
+    PleaseWait.prototype.finish = function(immediately, onLoadedCallback) {
+      if (immediately == null) {
+        immediately = false;
+      }
+      if (window.document.hidden) {
+        immediately = true;
+      }
+      this.finishing = true;
+      if (onLoadedCallback != null) {
+        this.updateOption('onLoadedCallback', onLoadedCallback);
+      }
+      if (this.loaded || immediately) {
+        return this._finish(immediately);
+      }
+    };
+
+    PleaseWait.prototype.updateOption = function(option, value) {
+      switch (option) {
+        case 'backgroundColor':
+          return this._loadingElem.style.backgroundColor = value;
+        case 'logo':
+          return this._logoElem.src = value;
+        case 'loadingHtml':
+          return this.updateLoadingHtml(value);
+        case 'onLoadedCallback':
+          return this._onLoadedCallback = value;
+        default:
+          throw new Error("Unknown option '" + option + "'");
+      }
+    };
+
+    PleaseWait.prototype.updateOptions = function(options) {
+      var k, v, _results;
+      if (options == null) {
+        options = {};
+      }
+      _results = [];
+      for (k in options) {
+        v = options[k];
+        _results.push(this.updateOption(k, v));
+      }
+      return _results;
+    };
+
+    PleaseWait.prototype.updateLoadingHtml = function(loadingHtml, immediately) {
+      if (immediately == null) {
+        immediately = false;
+      }
+      if (this._loadingHtmlElem == null) {
+        throw new Error("The loading template does not have an element of class 'pg-loading-html'");
+      }
+      if (immediately) {
+        this._loadingHtmlToDisplay = [loadingHtml];
+        this._readyToShowLoadingHtml = true;
+      } else {
+        this._loadingHtmlToDisplay.push(loadingHtml);
+      }
+      if (this._readyToShowLoadingHtml) {
+        return this._changeLoadingHtml();
+      }
+    };
+
+    PleaseWait.prototype._changeLoadingHtml = function() {
+      this._readyToShowLoadingHtml = false;
+      this._loadingHtmlElem.removeEventListener(transitionEvent, this._loadingHtmlListener);
+      this._loadingHtmlElem.removeEventListener(transitionEvent, this._removingHtmlListener);
+      removeClass("pg-loading", this._loadingHtmlElem);
+      removeClass("pg-removing", this._loadingHtmlElem);
+      if (transitionSupport) {
+        addClass("pg-removing", this._loadingHtmlElem);
+        return this._loadingHtmlElem.addEventListener(transitionEvent, this._removingHtmlListener);
+      } else {
+        return this._removingHtmlListener();
+      }
+    };
+
+    PleaseWait.prototype._finish = function(immediately) {
+      var listener;
+      if (immediately == null) {
+        immediately = false;
+      }
+      if (this._loadingElem == null) {
+        return;
+      }
+      addClass("pg-loaded", document.body);
+      if (typeof this._onLoadedCallback === "function") {
+        this._onLoadedCallback.apply(this);
+      }
+      listener = (function(_this) {
+        return function() {
+          document.body.removeChild(_this._loadingElem);
+          removeClass("pg-loading", document.body);
+          if (animationSupport) {
+            _this._loadingElem.removeEventListener(animationEvent, listener);
+          }
+          return _this._loadingElem = null;
+        };
+      })(this);
+      if (!immediately && animationSupport) {
+        addClass("pg-loaded", this._loadingElem);
+        return this._loadingElem.addEventListener(animationEvent, listener);
+      } else {
+        return listener();
+      }
+    };
+
+    return PleaseWait;
+
+  })();
+  pleaseWait = function(options) {
+    if (options == null) {
+      options = {};
+    }
+    return new PleaseWait(options);
+  };
+  exports.pleaseWait = pleaseWait;
+  return pleaseWait;
+});
+;define('please-wait', ['please-wait/build/please-wait'], function (main) { return main; });
+
+define('text!please-wait/build/please-wait.css', ['module'], function(module) { module.exports = "/* line 17, ../src/please-wait.scss */\nbody.pg-loading {\n  overflow: hidden;\n}\n\n/* line 21, ../src/please-wait.scss */\n.pg-loading-screen {\n  position: fixed;\n  bottom: 0;\n  left: 0;\n  right: 0;\n  top: 0;\n  z-index: 1000000;\n  opacity: 1;\n  background-color: #FFF;\n  -webkit-transition: background-color 0.4s ease-in-out 0s;\n  -moz-transition: background-color 0.4s ease-in-out 0s;\n  -ms-transition: background-color 0.4s ease-in-out 0s;\n  -o-transition: background-color 0.4s ease-in-out 0s;\n  transition: background-color 0.4s ease-in-out 0s;\n}\n/* line 32, ../src/please-wait.scss */\n.pg-loading-screen.pg-loaded {\n  opacity: 0;\n  -webkit-animation: pgAnimLoaded 0.5s cubic-bezier(0.7, 0, 0.3, 1) both;\n  -moz-animation: pgAnimLoaded 0.5s cubic-bezier(0.7, 0, 0.3, 1) both;\n  -ms-animation: pgAnimLoaded 0.5s cubic-bezier(0.7, 0, 0.3, 1) both;\n  -o-animation: pgAnimLoaded 0.5s cubic-bezier(0.7, 0, 0.3, 1) both;\n  animation: pgAnimLoaded 0.5s cubic-bezier(0.7, 0, 0.3, 1) both;\n}\n/* line 38, ../src/please-wait.scss */\n.pg-loading-screen.pg-loading .pg-loading-logo-header, .pg-loading-screen.pg-loading .pg-loading-html {\n  opacity: 1;\n}\n/* line 42, ../src/please-wait.scss */\n.pg-loading-screen.pg-loading .pg-loading-logo-header, .pg-loading-screen.pg-loading .pg-loading-html:not(.pg-loaded) {\n  -webkit-animation: pgAnimLoading 1s cubic-bezier(0.7, 0, 0.3, 1) both;\n  -moz-animation: pgAnimLoading 1s cubic-bezier(0.7, 0, 0.3, 1) both;\n  -ms-animation: pgAnimLoading 1s cubic-bezier(0.7, 0, 0.3, 1) both;\n  -o-animation: pgAnimLoading 1s cubic-bezier(0.7, 0, 0.3, 1) both;\n  animation: pgAnimLoading 1s cubic-bezier(0.7, 0, 0.3, 1) both;\n}\n/* line 46, ../src/please-wait.scss */\n.pg-loading-screen.pg-loading .pg-loading-html:not(.pg-loaded) {\n  -webkit-animation-delay: 0.3s;\n  -moz-animation-delay: 0.3s;\n  -ms-animation-delay: 0.3s;\n  -o-animation-delay: 0.3s;\n  animation-delay: 0.3s;\n}\n/* line 51, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-inner {\n  height: 100%;\n  width: 100%;\n  margin: 0;\n  padding: 0;\n  position: static;\n}\n/* line 59, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-center-outer {\n  width: 100%;\n  padding: 0;\n  display: table !important;\n  height: 100%;\n  position: absolute;\n  top: 0;\n  left: 0;\n  margin: 0;\n}\n/* line 70, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-center-middle {\n  padding: 0;\n  vertical-align: middle;\n  display: table-cell  !important;\n  margin: 0;\n  text-align: center;\n}\n/* line 78, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-logo-header, .pg-loading-screen .pg-loading-html {\n  width: 100%;\n  opacity: 0;\n}\n/* line 83, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-logo-header {\n  text-align: center;\n}\n/* line 86, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-logo-header img {\n  display: inline-block !important;\n}\n/* line 91, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-html {\n  margin-top: 90px;\n}\n/* line 94, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-html.pg-loaded {\n  -webkit-transition: opacity 0.5s cubic-bezier(0.7, 0, 0.3, 1);\n  -moz-transition: opacity 0.5s cubic-bezier(0.7, 0, 0.3, 1);\n  -ms-transition: opacity 0.5s cubic-bezier(0.7, 0, 0.3, 1);\n  -o-transition: opacity 0.5s cubic-bezier(0.7, 0, 0.3, 1);\n  transition: opacity 0.5s cubic-bezier(0.7, 0, 0.3, 1);\n}\n/* line 97, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-html.pg-loaded.pg-removing {\n  opacity: 0;\n}\n/* line 101, ../src/please-wait.scss */\n.pg-loading-screen .pg-loading-html.pg-loaded.pg-loading {\n  opacity: 1;\n}\n\n@-webkit-keyframes pgAnimLoading {\n  from {\n    opacity: 0;\n  }\n}\n@-moz-keyframes pgAnimLoading {\n  from {\n    opacity: 0;\n  }\n}\n@-o-keyframes pgAnimLoading {\n  from {\n    opacity: 0;\n  }\n}\n@-ms-keyframes pgAnimLoading {\n  from {\n    opacity: 0;\n  }\n}\n@keyframes pgAnimLoading {\n  from {\n    opacity: 0;\n  }\n}\n@-webkit-keyframes pgAnimLoaded {\n  from {\n    opacity: 1;\n  }\n}\n@-moz-keyframes pgAnimLoaded {\n  from {\n    opacity: 1;\n  }\n}\n@-o-keyframes pgAnimLoaded {\n  from {\n    opacity: 1;\n  }\n}\n@-ms-keyframes pgAnimLoaded {\n  from {\n    opacity: 1;\n  }\n}\n@keyframes pgAnimLoaded {\n  from {\n    opacity: 1;\n  }\n}\n"; });
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules/aurelia-binding/dist/amd/aurelia-binding","aurelia-bootstrapper":"../node_modules/aurelia-bootstrapper/dist/amd/aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules/aurelia-dependency-injection/dist/amd/aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules/aurelia-event-aggregator/dist/amd/aurelia-event-aggregator","aurelia-history":"../node_modules/aurelia-history/dist/amd/aurelia-history","aurelia-framework":"../node_modules/aurelia-framework/dist/amd/aurelia-framework","aurelia-history-browser":"../node_modules/aurelia-history-browser/dist/amd/aurelia-history-browser","aurelia-loader":"../node_modules/aurelia-loader/dist/amd/aurelia-loader","aurelia-loader-default":"../node_modules/aurelia-loader-default/dist/amd/aurelia-loader-default","aurelia-logging":"../node_modules/aurelia-logging/dist/amd/aurelia-logging","aurelia-logging-console":"../node_modules/aurelia-logging-console/dist/amd/aurelia-logging-console","aurelia-metadata":"../node_modules/aurelia-metadata/dist/amd/aurelia-metadata","aurelia-pal":"../node_modules/aurelia-pal/dist/amd/aurelia-pal","aurelia-pal-browser":"../node_modules/aurelia-pal-browser/dist/amd/aurelia-pal-browser","aurelia-path":"../node_modules/aurelia-path/dist/amd/aurelia-path","aurelia-route-recognizer":"../node_modules/aurelia-route-recognizer/dist/amd/aurelia-route-recognizer","aurelia-router":"../node_modules/aurelia-router/dist/amd/aurelia-router","aurelia-task-queue":"../node_modules/aurelia-task-queue/dist/amd/aurelia-task-queue","aurelia-templating":"../node_modules/aurelia-templating/dist/amd/aurelia-templating","aurelia-templating-binding":"../node_modules/aurelia-templating-binding/dist/amd/aurelia-templating-binding","text":"../node_modules/text/text","aurelia-polyfills":"../node_modules/aurelia-polyfills/dist/amd/aurelia-polyfills","jquery":"../node_modules/jquery/dist/jquery","js-cookie":"../node_modules/js-cookie/src/js.cookie","bootstrap-filestyle":"../node_modules/bootstrap-filestyle/src/bootstrap-filestyle","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"leaflet","location":"../node_modules/leaflet","main":"dist/leaflet-src.js"},{"name":"bootstrap","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-http-client","location":"../node_modules/aurelia-http-client/dist/amd","main":"aurelia-http-client"},{"name":"please-wait","location":"../node_modules/please-wait","main":"build/please-wait.js"}],"stubModules":["text"],"shim":{"bootstrap":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["app","environment","main","cookie/cookie-service","leaflet-map/MarkerModel","leaflet-map/leaflet-map","login/login","mode-menu/mode-menu","navigation/navigation-service","place-search/place-search","resources/index","rest/rest-service","user/user-service","leaflet-map/marker-note/marker-note","styles"]}})}

@@ -4,13 +4,23 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <title>Aurelia</title>
+  <title>Floodfront</title>
+  <link rel="stylesheet" href="node_modules/please-wait/build/please-wait.css">
+  <link rel="stylesheet" href="assets/index.css">
 </head>
 
-<div class="loader"></div>
-
 <body aurelia-app="main">
-  <script src="scripts/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>
+  <script src="node_modules/please-wait/build/please-wait.min.js"></script>
+  <script type="text/javascript">
+    window.loading_screen = window.pleaseWait({
+      logo: "https://placeholdit.imgix.net/~text?txtsize=5&txt=1%C3%971&w=1&h=1&txtpad=1",
+      backgroundColor: '#2e589b',
+      loadingHtml: "<div class='loader'></div><div class='loading-message'>Loading Floodfront...</div>"
+    });
+  </script>
+  <script src="scripts/vendor-bundle.js" data-main="aurelia-bootstrapper">
+
+  </script>
 </body>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
