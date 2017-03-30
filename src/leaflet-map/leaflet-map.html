@@ -2,6 +2,7 @@
     <require from="leaflet/dist/leaflet.css"></require>
     <require from="./marker-note/marker-note"></require>
     <require from="./leaflet-map.css"></require>
+    <require from="resources/elements/information"></require>
     <div class="map-context-menu">
     </div>
     <div class="map-button-container" style="bottom: 20px; right: 10px;">
@@ -9,7 +10,7 @@
         <button class="map-button btn" click.delegate="primeMarker('BORDER')"><img src="/assets/images/marker_border.svg"></button>
         <button class="map-button btn" click.delegate="primeMarker('FLOOD')"><img src="/assets/images/marker_flood.svg"></button>
         <!--<button class="map-button btn" (click)="primeDirectionalMarker()"><span class="glyphicon glyphicon-repeat"></span></button>-->
-        <button class="map-button btn" (click)="toggleInfo()">
+        <button class="map-button btn" click.delegate="toggleInfo()">
             <img src="/assets/images/info.svg" style="width: 100%;">
         </button>
     </div>
@@ -26,6 +27,7 @@
     <marker-menu (onMarkerPicked)="onMarkerPicked($event)"></marker-menu>
     <marker-note></marker-note>
     <div class="place-search-input-container">
-        <input type="text" value.bind="placeQuery" keyup.delegate="query($event)" placeholder="Search...">
+        <input type="text" value.bind="placeQuery" keyup.delegate="query($event)" placeholder.bind="searchText">
     </div>
+    <information></information>
 </template>

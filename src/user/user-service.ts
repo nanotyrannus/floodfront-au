@@ -10,9 +10,8 @@ export class UserService {
     private _mode: string
 
     constructor(private cookies: CookieService, public router: Router, public rest: RestService) {
-        if (!this.cookies.get("email")) {
-            this.router.navigate("")
-        } else {
+        console.log(`UserService constructed!`)
+        if (this.cookies.get("email")) {
             this._email = this.cookies.get("email")
         }
     }
@@ -21,6 +20,7 @@ export class UserService {
         let response = await this.rest.postWithRetry("login", { "email": email })
         let data = response.content
         this.router.navigate("mode")
+        this._email = email
         this.cookies.set("email", email)
         return data
     }

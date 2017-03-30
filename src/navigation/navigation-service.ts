@@ -2,7 +2,7 @@ export class NavigationService {
 
     private watchId: number
     public currentPosition = {
-        accuracy : -1,
+        accuracy: -1,
         lat: -1,
         lon: -1
     }
@@ -23,6 +23,7 @@ export class NavigationService {
         let options = {
             "enableHighAccuracy": true
         }
+        
         return new Promise(function (resolve, reject) {
             window.navigator.geolocation.getCurrentPosition(resolve, reject, options)
         })

@@ -141,21 +141,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../rest/rest-service", "../user/user-service", "aurelia-framework", "./MarkerModel", "leaflet", "./marker-note/marker-note", "../navigation/navigation-service", "aurelia-event-aggregator", "../place-search/place-search"], function (require, exports, aurelia_router_1, rest_service_1, user_service_1, aurelia_framework_1, MarkerModel_1, leaflet_1, marker_note_1, navigation_service_1, aurelia_event_aggregator_1, place_search_1) {
+define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../rest/rest-service", "../user/user-service", "aurelia-framework", "./MarkerModel", "leaflet", "./marker-note/marker-note", "../navigation/navigation-service", "aurelia-event-aggregator", "../place-search/place-search", "../resources/elements/information"], function (require, exports, aurelia_router_1, rest_service_1, user_service_1, aurelia_framework_1, MarkerModel_1, leaflet_1, marker_note_1, navigation_service_1, aurelia_event_aggregator_1, place_search_1, information_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var LeafletMap = (function () {
-        function LeafletMap(router, rest, userService, markerNote, eventAggregator, nav, search) {
+        function LeafletMap(router, rest, userService, markerNote, info, eventAggregator, nav, search) {
             var _this = this;
             this.router = router;
             this.rest = rest;
             this.userService = userService;
             this.markerNote = markerNote;
+            this.info = info;
             this.eventAggregator = eventAggregator;
             this.nav = nav;
             this.search = search;
             this.primed = false;
             this.files = new Map();
+            this.searchText = "Search...";
             this.eventAggregator.subscribe("marker-note", function (data) {
                 console.log(data);
                 _this.markersModels.forEach(function (markerModel) {
@@ -167,6 +169,10 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
         }
         LeafletMap.prototype.attached = function () {
             var _this = this;
+            if (!this.userService.email) {
+                this.router.navigate("");
+                return;
+            }
             window['leafletComponent'] = {
                 "upload": function (id) { return _this.upload(id); },
                 "openNote": function () {
@@ -323,7 +329,7 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
                 var data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.rest.postWithRetry("marker/2/retrieve", { "email": "ryan" })];
+                        case 0: return [4 /*yield*/, this.rest.postWithRetry("marker/2/retrieve", { "email": this.userService.email })];
                         case 1:
                             data = _a.sent();
                             console.log("Markers!", data);
@@ -423,18 +429,27 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
                 _this.selectedMarker.closePopup();
             });
         };
-        LeafletMap.prototype.toggleInfo = function () { };
+        LeafletMap.prototype.toggleInfo = function () {
+            this.info.toggle();
+        };
         LeafletMap.prototype.centerMap = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var pos;
+                var pos, e_1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.nav.getCurrentPosition()];
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.nav.getCurrentPosition()];
                         case 1:
                             pos = _a.sent();
                             console.log(pos);
                             this.leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 18);
-                            return [2 /*return*/];
+                            return [3 /*break*/, 3];
+                        case 2:
+                            e_1 = _a.sent();
+                            console.log("centerMap something went wrong");
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/];
                     }
                 });
             });
@@ -465,6 +480,7 @@ define('leaflet-map/leaflet-map',["require", "exports", "aurelia-router", "../re
             rest_service_1.RestService,
             user_service_1.UserService,
             marker_note_1.MarkerNoteCustomElement,
+            information_1.InformationCustomElement,
             aurelia_event_aggregator_1.EventAggregator,
             navigation_service_1.NavigationService,
             place_search_1.PlaceSearch])
@@ -519,40 +535,6 @@ define('login/login',["require", "exports", "aurelia-router", "aurelia-framework
     exports.Login = Login;
 });
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('mode-menu/mode-menu',["require", "exports", "../user/user-service", "aurelia-router", "aurelia-framework"], function (require, exports, user_service_1, aurelia_router_1, aurelia_framework_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ModeMenu = (function () {
-        function ModeMenu(userService, router) {
-            this.userService = userService;
-            this.router = router;
-            this.email = userService.email;
-        }
-        ModeMenu.prototype.enterMap = function (mode) {
-            this.userService.mode = mode;
-            this.router.navigate("map");
-        };
-        ModeMenu.prototype.logout = function () {
-            this.userService.logout();
-        };
-        return ModeMenu;
-    }());
-    ModeMenu = __decorate([
-        aurelia_framework_1.autoinject(),
-        __metadata("design:paramtypes", [user_service_1.UserService, aurelia_router_1.Router])
-    ], ModeMenu);
-    exports.ModeMenu = ModeMenu;
-});
-
 define('navigation/navigation-service',["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -585,6 +567,42 @@ define('navigation/navigation-service',["require", "exports"], function (require
         return NavigationService;
     }());
     exports.NavigationService = NavigationService;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('mode-menu/mode-menu',["require", "exports", "../user/user-service", "aurelia-router", "aurelia-framework"], function (require, exports, user_service_1, aurelia_router_1, aurelia_framework_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ModeMenu = (function () {
+        function ModeMenu(userService, router) {
+            this.userService = userService;
+            this.router = router;
+        }
+        ModeMenu.prototype.created = function () {
+            this.email = this.userService.email;
+        };
+        ModeMenu.prototype.enterMap = function (mode) {
+            this.userService.mode = mode;
+            this.router.navigate("map");
+        };
+        ModeMenu.prototype.logout = function () {
+            this.userService.logout();
+        };
+        return ModeMenu;
+    }());
+    ModeMenu = __decorate([
+        aurelia_framework_1.autoinject(),
+        __metadata("design:paramtypes", [user_service_1.UserService, aurelia_router_1.Router])
+    ], ModeMenu);
+    exports.ModeMenu = ModeMenu;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -663,14 +681,6 @@ define('place-search/place-search',["require", "exports", "aurelia-http-client",
     exports.PlaceSearch = PlaceSearch;
 });
 
-define('resources/index',["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    function configure(config) {
-    }
-    exports.configure = configure;
-});
-
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -719,50 +729,33 @@ define('rest/rest-service',["require", "exports", "aurelia-http-client"], functi
         }
         RestService.prototype.postWithRetry = function (endpoint, body) {
             return __awaiter(this, void 0, void 0, function () {
-                var response, data, e_1;
+                var response, data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             response = null;
                             data = null;
-                            _a.label = 1;
-                        case 1:
-                            _a.trys.push([1, 3, , 4]);
                             return [4 /*yield*/, this._client.post("" + endpoint, body)];
-                        case 2:
+                        case 1:
                             response = _a.sent();
                             data = response.content;
-                            return [3 /*break*/, 4];
-                        case 3:
-                            e_1 = _a.sent();
-                            console.warn("Failed to post!");
-                            return [3 /*break*/, 4];
-                        case 4: return [2 /*return*/, data];
+                            return [2 /*return*/, data];
                     }
                 });
             });
         };
         RestService.prototype.getWithRetry = function (endpoint) {
             return __awaiter(this, void 0, void 0, function () {
-                var response, data, e_2;
+                var response, data;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             response = null;
                             data = null;
-                            _a.label = 1;
-                        case 1:
-                            _a.trys.push([1, 3, , 4]);
                             return [4 /*yield*/, this._client.get(this.baseUrl + "/" + endpoint)];
-                        case 2:
+                        case 1:
                             response = _a.sent();
                             data = response.content;
-                            return [3 /*break*/, 4];
-                        case 3:
-                            e_2 = _a.sent();
-                            console.warn("Failed to post!");
-                            return [3 /*break*/, 4];
-                        case 4:
                             console.log("Server response", response);
                             return [2 /*return*/, data];
                     }
@@ -772,6 +765,14 @@ define('rest/rest-service',["require", "exports", "aurelia-http-client"], functi
         return RestService;
     }());
     exports.RestService = RestService;
+});
+
+define('resources/index',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function configure(config) {
+    }
+    exports.configure = configure;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -826,10 +827,8 @@ define('user/user-service',["require", "exports", "../cookie/cookie-service", ".
             this.cookies = cookies;
             this.router = router;
             this.rest = rest;
-            if (!this.cookies.get("email")) {
-                this.router.navigate("");
-            }
-            else {
+            console.log("UserService constructed!");
+            if (this.cookies.get("email")) {
                 this._email = this.cookies.get("email");
             }
         }
@@ -843,6 +842,7 @@ define('user/user-service',["require", "exports", "../cookie/cookie-service", ".
                             response = _a.sent();
                             data = response.content;
                             this.router.navigate("mode");
+                            this._email = email;
                             this.cookies.set("email", email);
                             return [2 /*return*/, data];
                     }
@@ -975,16 +975,41 @@ define('leaflet-map/marker-note/marker-note',["require", "exports", "aurelia-eve
     exports.MarkerNoteCustomElement = MarkerNoteCustomElement;
 });
 
+define('resources/elements/information',["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var InformationCustomElement = (function () {
+        function InformationCustomElement() {
+            this.name = "Information";
+            this.style = { visibility: "visible" };
+            this.isVisible = true;
+        }
+        InformationCustomElement.prototype.toggle = function () {
+            console.log("information#toggle called", this.style);
+            this.isVisible = !this.isVisible;
+            if (this.isVisible) {
+                this.style.visibility = "visible";
+            }
+            else {
+                this.style.visibility = "hidden";
+            }
+        };
+        return InformationCustomElement;
+    }());
+    exports.InformationCustomElement = InformationCustomElement;
+});
+
 define('text!app.html', ['module'], function(module) { module.exports = "<template><require from=\"styles.css\"></require><router-view></router-view></template>"; });
 define('text!styles.css', ['module'], function(module) { module.exports = "body, html {\n    width: 100%;\n    height: 100%;\n    box-sizing: border-box;\n    margin: 0;\n    padding: 0;\n    background-color: #2e589b;\n}\n\n@media (max-width: 400) {\n    span.login-title {\n        font-size: 3em;\n    }\n}\n\n@media (max-width: 800) {\n    span.login-title {\n        font-size: 5em;\n    }\n}\n\n#map {\n    width: 100%;\n    height: 100%;\n}\n\n/* Overriding leaflet class */\n.leaflet-control-zoom {\n    position: fixed !important;\n    bottom: 20%;\n    right: 3%;\n}\n\n.map-button {\n    height: 3em;\n    width: 3em;\n    background-color: #02a4d3;\n    color: #FFFFFF;\n    border: none;\n    background-color: #d3d3d3;\n}\n\n.context-btn {\n    margin-bottom: 1em !important;\n    width: 100%;\n}\n\n.map-button:active {\n    background-color: #FFFFFF;\n    color: #02a4d3;\n}\n\n.map-button-container {\n    z-index: 401;\n    position: absolute;\n    /*bottom: 20px;\n    right: 10px;*/\n}\n\n.map-thumbnail {\n    width: 200px;\n    height: 200px;\n}\n\n.marker-menu-button {\n    color: white;\n    background-color: #4c97ba;\n    display: table;\n    width: 100%;\n    height: 22%;\n    margin: 2%;\n}\n\n.marker-note-container {\n    z-index: 402;\n    width: 80%;\n    height: 50%;\n    position: fixed;\n    background-color: white;\n    right: 0;\n    left: 0;\n    top: 25%;\n    margin-right: auto;\n    margin-left: auto;\n    padding: 1%;\n}\n\n.marker-menu-text {\n    display: table-cell;\n    align-items: center;\n}\n\n.marker-menu-container {\n    position: fixed;\n    background-color: white;\n    right: 0;\n    left: 0;\n    top: 40%;\n    margin-right: auto;\n    margin-left: auto;\n    width: 75%;\n    height: 30%;\n    z-index:402;\n    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);\n    padding: 5%;\n}\n\n\n\n.login-container {}\n\n.vertical-center {\n  min-height: 100%;  /* Fallback for browsers do NOT support vh unit */\n  min-height: 100vh; /* These two lines are counted as one :-)       */\n\n  display: flex;\n  align-items: center;\n}\n\n.footer {\n    box-sizing: border-box;\n    color: rgb(100%, 100%, 100%);\n    width: 100%;\n    height: 10%;\n    background-color: rgb(20.2%, 20.2%, 20.2%);\n}\n\n.link:link {\n    text-decoration: none;\n}\n\n.link:hover {\n    text-decoration: none;\n}\n\n.slider-container {\n    position: fixed;\n    top: 100px;\n    left: 100px;\n    z-index: 400;\n}\n\n.jcs-value {\n    display: none;\n}"; });
-define('text!leaflet-map/leaflet-map.html', ['module'], function(module) { module.exports = "<template><require from=\"leaflet/dist/leaflet.css\"></require><require from=\"./marker-note/marker-note\"></require><require from=\"./leaflet-map.css\"></require><div class=\"map-context-menu\"></div><div class=\"map-button-container\" style=\"bottom:20px;right:10px\"><button class=\"map-button btn\" click.delegate=\"primeMarker('WALKABLE')\"><img src=\"/assets/images/marker_walkable.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('BORDER')\"><img src=\"/assets/images/marker_border.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('FLOOD')\"><img src=\"/assets/images/marker_flood.svg\"></button> <button class=\"map-button btn\" (click)=\"toggleInfo()\"><img src=\"/assets/images/info.svg\" style=\"width:100%\"></button></div><div class=\"map-button-container\" style=\"bottom:20px;left:10px\"><button class=\"map-button btn\" click.delegate=\"goBack()\"><span class=\"glyphicon glyphicon-chevron-left\"></span></button></div><div class=\"map-button-container\" style=\"bottom:12%;right:10px\"><button class=\"map-button btn\" click.delegate=\"centerMap()\"><img src=\"/assets/images/crosshair.svg\"></button></div><div id=\"map\"></div><popup [x]=\"clickX\" [y]=\"clickY\"></popup><marker-menu (onmarkerpicked)=\"onMarkerPicked($event)\"></marker-menu><marker-note></marker-note><div class=\"place-search-input-container\"><input type=\"text\" value.bind=\"placeQuery\" keyup.delegate=\"query($event)\" placeholder=\"Search...\"></div></template>"; });
+define('text!leaflet-map/leaflet-map.html', ['module'], function(module) { module.exports = "<template><require from=\"leaflet/dist/leaflet.css\"></require><require from=\"./marker-note/marker-note\"></require><require from=\"./leaflet-map.css\"></require><require from=\"resources/elements/information\"></require><div class=\"map-context-menu\"></div><div class=\"map-button-container\" style=\"bottom:20px;right:10px\"><button class=\"map-button btn\" click.delegate=\"primeMarker('WALKABLE')\"><img src=\"/assets/images/marker_walkable.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('BORDER')\"><img src=\"/assets/images/marker_border.svg\"></button> <button class=\"map-button btn\" click.delegate=\"primeMarker('FLOOD')\"><img src=\"/assets/images/marker_flood.svg\"></button> <button class=\"map-button btn\" click.delegate=\"toggleInfo()\"><img src=\"/assets/images/info.svg\" style=\"width:100%\"></button></div><div class=\"map-button-container\" style=\"bottom:20px;left:10px\"><button class=\"map-button btn\" click.delegate=\"goBack()\"><span class=\"glyphicon glyphicon-chevron-left\"></span></button></div><div class=\"map-button-container\" style=\"bottom:12%;right:10px\"><button class=\"map-button btn\" click.delegate=\"centerMap()\"><img src=\"/assets/images/crosshair.svg\"></button></div><div id=\"map\"></div><popup [x]=\"clickX\" [y]=\"clickY\"></popup><marker-menu (onmarkerpicked)=\"onMarkerPicked($event)\"></marker-menu><marker-note></marker-note><div class=\"place-search-input-container\"><input type=\"text\" value.bind=\"placeQuery\" keyup.delegate=\"query($event)\" placeholder.bind=\"searchText\"></div><information></information></template>"; });
 define('text!leaflet-map/leaflet-map.css', ['module'], function(module) { module.exports = ".place-search-input-container {\n    position: fixed;\n    top: 3%;\n    left: 3%;\n    padding: 1%;\n    z-index: 400;\n    background-color: white;\n    opacity: 0.3;\n}\n\n.place-search-input-container:hover {\n    opacity: 1.0;\n}"; });
-define('text!login/login.html', ['module'], function(module) { module.exports = "<template><require from=\"login/login.css\"></require><div class=\"login-component-container vertical-center container\"><div class=\"container\"><div class=\"row\"><div class=\"col-md-12 col-xs-12 col-lg-12\"><div style=\"justify-content:center;display:flex;align-items:center;margin-top:10%\"><img src=\"assets/images/marker_walkable.svg\" class=\"logo\"> <img src=\"assets/images/marker_border.svg\" class=\"logo\"> <img src=\"assets/images/marker_flood.svg\" class=\"logo\"></div><div class=\"text-center\"><span class=\"login-title text-center\">Flood Front</span></div></div></div><div class=\"row\"><div class=\"col-md-12 col-sm-12 col-xs-12\"><div class=\"login-container\" style=\"width:100%\"><div class=\"input-group\" style=\"width:75%;margin:0 auto\"><span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-envelope\"></span> </span><input type=\"text\" keyup.delegate=\"login($event)\" class=\"form-control\" placeholder=\"Email\" value.bind=\"email\"> <span class=\"input-group-btn\"><button class=\"btn btn-default\" disabled.bind=\"email.length < 1\" click.delegate=\"login($event)\">ENTER</button></span></div></div></div></div></div></div></template>"; });
 define('text!login/login.css', ['module'], function(module) { module.exports = "input[type=\"text\"] {\n    font-size: 2em;\n}\n\n.login-title {\n    color: white;\n    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);\n    font-size: 3em;\n}\n\n.login-component-container {\n    box-sizing: border-box;\n    width: 100%;\n    height: 100%;\n    /*background-image: url('/assets/images/albert st brisbane.jpg');*/\n    /*background-size: cover;*/\n}\n\n.logo {\n    width: 20%;\n    margin-left: 3%;\n    margin-right: 3%;\n    /*height: 250px;*/\n}"; });
-define('text!mode-menu/mode-menu.html', ['module'], function(module) { module.exports = "<template><require from=\"./mode-menu.css\"></require><div><div class=\"mode-title\"><span>Logged in as ${ email }. Where are you?</span></div><div class=\"mode-button\" click.delegate=\"enterMap('field')\"><span>Out in the Field</span></div><div class=\"mode-button\" click.delegate=\"enterMap('desktop')\"><span>At a Desk</span></div><div class=\"mode-button\" click.delegate=\"logout()\"><span>Leaving (Log out)</span></div></div></template>"; });
+define('text!login/login.html', ['module'], function(module) { module.exports = "<template><require from=\"login/login.css\"></require><div class=\"login-component-container vertical-center container\"><div class=\"container\"><div class=\"row\"><div class=\"col-md-12 col-xs-12 col-lg-12\"><div style=\"justify-content:center;display:flex;align-items:center;margin-top:10%\"><img src=\"assets/images/marker_walkable.svg\" class=\"logo\"> <img src=\"assets/images/marker_border.svg\" class=\"logo\"> <img src=\"assets/images/marker_flood.svg\" class=\"logo\"></div><div class=\"text-center\"><span class=\"login-title text-center\">Flood Front</span></div></div></div><div class=\"row\"><div class=\"col-md-12 col-sm-12 col-xs-12\"><div class=\"login-container\" style=\"width:100%\"><div class=\"input-group\" style=\"width:75%;margin:0 auto\"><span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-envelope\"></span> </span><input type=\"text\" keyup.delegate=\"login($event)\" class=\"form-control\" placeholder=\"Email\" value.bind=\"email\"> <span class=\"input-group-btn\"><button class=\"btn btn-default\" disabled.bind=\"email.length < 1\" click.delegate=\"login($event)\">ENTER</button></span></div></div></div></div></div></div></template>"; });
 define('text!mode-menu/mode-menu.css', ['module'], function(module) { module.exports = ".mode-title {\n    text-align: center;\n    color: white;\n    font-size: 3em;\n    margin: 5%;\n}\n\n.mode-button {\n    margin: 3%;\n    font-size: 5em;\n    text-align: center;\n    background-color: black;\n    color: white;\n}"; });
-define('text!place-search/place-search.html', ['module'], function(module) { module.exports = "<template><require from=\"./place-search.css\"></require></template>"; });
+define('text!mode-menu/mode-menu.html', ['module'], function(module) { module.exports = "<template><require from=\"./mode-menu.css\"></require><div><div class=\"mode-title\"><span>Logged in as ${ email }. Where are you?</span></div><div class=\"mode-button\" click.delegate=\"enterMap('field')\"><span>Out in the Field</span></div><div class=\"mode-button\" click.delegate=\"enterMap('desktop')\"><span>At a Desk</span></div><div class=\"mode-button\" click.delegate=\"logout()\"><span>Leaving (Log out)</span></div></div></template>"; });
 define('text!place-search/place-search.css', ['module'], function(module) { module.exports = ""; });
-define('text!leaflet-map/marker-note/marker-note.html', ['module'], function(module) { module.exports = "<template><require from=\"./marker-note.css\"></require><div class=\"marker-note-container\" class.bind=\"visible ? 'marker-visible' : 'marker-hidden'\"><textarea style=\"width:100%;height:80%\" value.bind=\"description\"></textarea><button class=\"btn btn-primary\" style=\"width:49%\" click.delegate=\"submit()\">Submit</button> <button class=\"btn btn-secondary\" style=\"width:49%\" click.delegate=\"close()\">Cancel</button></div></template>"; });
+define('text!place-search/place-search.html', ['module'], function(module) { module.exports = "<template><require from=\"./place-search.css\"></require></template>"; });
 define('text!leaflet-map/marker-note/marker-note.css', ['module'], function(module) { module.exports = ".marker-hidden {\n    display: none;\n}\n\n.marker-visible {\n    display: block;\n}"; });
+define('text!leaflet-map/marker-note/marker-note.html', ['module'], function(module) { module.exports = "<template><require from=\"./marker-note.css\"></require><div class=\"marker-note-container\" class.bind=\"visible ? 'marker-visible' : 'marker-hidden'\"><textarea style=\"width:100%;height:80%\" value.bind=\"description\"></textarea><button class=\"btn btn-primary\" style=\"width:49%\" click.delegate=\"submit()\">Submit</button> <button class=\"btn btn-secondary\" style=\"width:49%\" click.delegate=\"close()\">Cancel</button></div></template>"; });
+define('text!resources/elements/information.html', ['module'], function(module) { module.exports = "<template><div class=\"marker-menu-container\" css.bind=\"style\"><div><img style=\"height:25%\" src=\"/assets/images/marker_walkable.svg\"> <span>Not Flooded</span></div><div><img style=\"height:25%\" src=\"/assets/images/marker_border.svg\"> <span>Flood Boundary</span></div><div><img style=\"height:25%\" src=\"/assets/images/marker_flood.svg\"> <span>Flooded</span></div><button class=\"btn btn-default\" click.delegate=\"toggle()\">CLOSE</button></div><div class=\"marker-menu-text\">Text</div></template>"; });
 //# sourceMappingURL=app-bundle.js.map

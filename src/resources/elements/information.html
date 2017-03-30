@@ -1,0 +1,18 @@
+<template>
+    <div class="marker-menu-container" css.bind="style">
+        <div>
+            <img style="height: 25%;" src="/assets/images/marker_walkable.svg">
+            <span>Not Flooded</span>
+        </div>
+        <div>
+            <img style="height: 25%;" src="/assets/images/marker_border.svg">
+            <span>Flood Boundary</span>
+        </div>
+        <div>
+            <img style="height: 25%;" src="/assets/images/marker_flood.svg">
+            <span>Flooded</span>
+        </div>
+        <button class="btn btn-default" click.delegate="toggle()">CLOSE</button>
+    </div>
+    <div class="marker-menu-text">Text</div>
+</template>

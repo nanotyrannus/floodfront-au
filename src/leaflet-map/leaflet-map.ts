@@ -8,6 +8,7 @@ import { MarkerNoteCustomElement } from "./marker-note/marker-note"
 import { NavigationService } from "../navigation/navigation-service"
 import { EventAggregator } from "aurelia-event-aggregator"
 import { PlaceSearch } from "../place-search/place-search"
+import { InformationCustomElement } from "../resources/elements/information"
 
 @autoinject
 export class LeafletMap {
@@ -19,12 +20,14 @@ export class LeafletMap {
     private markersModels: MarkerModel[]
     private files: Map<any, File> = new Map<any, File>()
     private placeQuery: string
+    private searchText = "Search..."
 
     constructor(
         private router: Router,
         private rest: RestService,
         private userService: UserService,
         private markerNote: MarkerNoteCustomElement,
+        private info: InformationCustomElement,
         private eventAggregator: EventAggregator,
         private nav: NavigationService,
         private search: PlaceSearch) {
@@ -42,6 +45,10 @@ export class LeafletMap {
     }
 
     attached() {
+        if (!this.userService.email) {
+            this.router.navigate("")
+            return
+        }
 
         window['leafletComponent'] = {
             "upload": (id) => this.upload(id),
@@ -270,7 +277,7 @@ export class LeafletMap {
 
     private async getMarkers() {
         // Must remove magic number '2'
-        let data = await this.rest.postWithRetry("marker/2/retrieve", { "email": "ryan" })
+        let data = await this.rest.postWithRetry("marker/2/retrieve", { "email": this.userService.email })
         console.log("Markers!", data)
         data.markers.forEach((marker: MarkerModel) => {
             this.spawnMarker([marker.lat, marker.lon], marker.marker_type, marker)
@@ -363,16 +370,22 @@ export class LeafletMap {
         })
     }
 
-    private toggleInfo() { }
+    private toggleInfo() {
+        this.info.toggle()
+    }
 
     /**
      * Centers map on user location using GPS Navigation.
      */
     private async centerMap() {
         // TODO r
-        let pos: any = await this.nav.getCurrentPosition()
-        console.log(pos)
-        this.leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 18)
+        try {
+            let pos: any = await this.nav.getCurrentPosition()
+            console.log(pos)
+            this.leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 18)
+        } catch (e) {
+            console.log("centerMap something went wrong")
+        }
     }
 
     private async query(event: KeyboardEvent) {
