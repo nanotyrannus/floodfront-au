@@ -9,6 +9,7 @@ import { NavigationService } from "../navigation/navigation-service"
 import { EventAggregator } from "aurelia-event-aggregator"
 import { PlaceSearch } from "../place-search/place-search"
 import { InformationCustomElement } from "../resources/elements/information"
+import { child } from "aurelia-framework"
 
 @autoinject
 export class LeafletMap {
@@ -20,14 +21,15 @@ export class LeafletMap {
     private markersModels: MarkerModel[]
     private files: Map<any, File> = new Map<any, File>()
     private placeQuery: string
-    private searchText = "Search..."
+    private searchText = "Search text"
+    @child('information') private info: InformationCustomElement
 
     constructor(
         private router: Router,
         private rest: RestService,
         private userService: UserService,
         private markerNote: MarkerNoteCustomElement,
-        private info: InformationCustomElement,
+        // private info: InformationCustomElement,
         private eventAggregator: EventAggregator,
         private nav: NavigationService,
         private search: PlaceSearch) {
@@ -372,6 +374,7 @@ export class LeafletMap {
 
     private toggleInfo() {
         this.info.toggle()
+        // this.eventAggregator.publish("toggle-info", true)
     }
 
     /**
