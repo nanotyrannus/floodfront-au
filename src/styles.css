@@ -24,22 +24,6 @@ body, html {
     height: 100%;
 }
 
-/* Overriding leaflet class */
-.leaflet-control-zoom {
-    position: fixed !important;
-    bottom: 20%;
-    right: 3%;
-}
-
-.map-button {
-    height: 3em;
-    width: 3em;
-    background-color: #02a4d3;
-    color: #FFFFFF;
-    border: none;
-    background-color: #d3d3d3;
-}
-
 .context-btn {
     margin-bottom: 1em !important;
     width: 100%;
@@ -48,13 +32,6 @@ body, html {
 .map-button:active {
     background-color: #FFFFFF;
     color: #02a4d3;
-}
-
-.map-button-container {
-    z-index: 401;
-    position: absolute;
-    /*bottom: 20px;
-    right: 10px;*/
 }
 
 .map-thumbnail {

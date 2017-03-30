@@ -1,6 +1,12 @@
 .pg-loading-logo {
 }
 
+.loading-message {
+    color: #ffffff;
+}
+
+/* CSS SPINNER */
+
 .loader {
   color: #ffffff;
   font-size: 20px;
@@ -70,3 +76,5 @@
     box-shadow: 0em -3em 0 0, 2em -2em 0 -1em, 3em 0 0 -1em, 2em 2em 0 -1em, 0 3em 0 -1em, -2em 2em 0 0, -3em 0em 0 0, -2em -2em 0 0.2em;
   }
 }
+
+/* CSS SPINNER END*/

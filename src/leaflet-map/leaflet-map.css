@@ -11,3 +11,32 @@
 .place-search-input-container:hover {
     opacity: 1.0;
 }
+
+/* Overriding leaflet class */
+.leaflet-control-zoom {
+    position: fixed !important;
+    bottom: 20%;
+    right: 10px;
+}
+
+.back-button {
+    position: absolute;
+    z-index: 401;
+    bottom: 20px;
+    left: 10px;
+}
+
+.map-button {
+    height: 3em;
+    width: 3em;
+    color: #FFFFFF;
+    border: none;
+    background-color: #d3d3d3;
+}
+
+.map-button-container {
+    z-index: 401;
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+}
