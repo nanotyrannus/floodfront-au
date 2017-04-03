@@ -374,7 +374,6 @@ export class LeafletMap {
 
     private toggleInfo() {
         this.info.toggle()
-        // this.eventAggregator.publish("toggle-info", true)
     }
 
     /**

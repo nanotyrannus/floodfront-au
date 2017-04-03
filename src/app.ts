@@ -1,9 +1,13 @@
-import { Router, RouterConfiguration } from "aurelia-router"
 declare let window: any
+
+import { child } from "aurelia-framework"
+import { Router, RouterConfiguration } from "aurelia-router"
+import { LoadingIndicatorCustomElement } from "./resources/elements/loading-indicator/loading-indicator"
 
 export class App {
   private message = `Floodfront ${(new Date()).toISOString()}`
   private router: Router
+  @child('loading-indicator') private indicator: LoadingIndicatorCustomElement
 
   created() {
     console.log("Main component created!")

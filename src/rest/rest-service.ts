@@ -1,15 +1,23 @@
+import { autoinject } from "aurelia-framework"
 import { HttpClient } from "aurelia-http-client"
+import { EventAggregator } from "aurelia-event-aggregator"
 
+@autoinject()
 export class RestService {
-    private _client = new HttpClient().configure(x => {
-        x.withBaseUrl("https://floodfront.net:8080")
-    })
+    private _client: HttpClient
     private baseUrl = `${"https"}//${"floodfront.net"}:${8080}`
     private inProgress = new Map()
+    private activeRequests = 0
 
-    constructor() { }
+    constructor(private ea: EventAggregator) {
+        console.log(`RestService constructed!`)
+        this._client = new HttpClient().configure(x => {
+            x.withBaseUrl("https://floodfront.net:8080")
+        })
+    }
 
     public async postWithRetry(endpoint: string, body: any) {
+        this.start()
         let data
         let attempts = 0
         while (data == null) {
@@ -21,10 +29,12 @@ export class RestService {
                 await this.wait(3000)
             }
         }
+        this.finish()
         return data
     }
 
     public async getWithRetry(endpoint: string) {
+        this.start()
         let data
         let attempts = 0
         while (data == null) {
@@ -36,6 +46,7 @@ export class RestService {
                 await this.wait(3000)
             }
         }
+        this.finish()
         return data
     }
 
@@ -64,5 +75,17 @@ export class RestService {
                 resolve()
             }, time | 0)
         })
+    }
+
+    private start() {
+        this.activeRequests++
+        this.ea.publish("loading-indicator", true)
+    }
+
+    private finish() {
+        this.activeRequests--
+        if (this.activeRequests === 0) {
+            this.ea.publish("loading-indicator", false)
+        }
     }
 }
