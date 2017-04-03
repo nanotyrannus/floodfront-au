@@ -21,7 +21,7 @@ export class Login {
         if (event.type === "click" || (event as KeyboardEvent).which === 13) {
             console.log(`email entered: ${this.email}`)
             window.loading_screen = window.pleaseWait({
-                logo: "https://placeholdit.imgix.net/~text?txtsize=5&txt=1%C3%971&w=1&h=1&txtpad=1",
+                logo: "assets/images/blank.svg",
                 backgroundColor: '#2e589b',
                 loadingHtml: "<div class='loading-message'>Logging in...</div>"
             });
