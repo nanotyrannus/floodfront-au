@@ -40,3 +40,34 @@
     bottom: 20px;
     right: 10px;
 }
+
+.location-button {
+    bottom: 12%;
+    right: 10px;
+}
+
+@media (min-width: 768px) {
+    .map-button {
+        width: 3.5em;
+        height: 3.5em;
+    }
+
+}
+
+@media (min-width:992px) {
+    .map-button {
+        width: 4em;
+        height: 4em;
+    }
+}
+
+@media (min-width: 1200px) {
+    .map-button {
+        width: 5em;
+        height: 5em;
+    }
+
+    .location-button {
+        bottom: 14%;
+    }
+}
