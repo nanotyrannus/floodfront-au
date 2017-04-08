@@ -33,5 +33,6 @@ export class InformationCustomElement {
 
     public toggleAndSave() {
         this.cookies.set("on-create-info", "hide")
+        this.toggle()
     }
 }

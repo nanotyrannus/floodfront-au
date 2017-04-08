@@ -1,0 +1,28 @@
+<template>
+    <require from="./search.css"></require>
+    <div class="search-container container" css="top: ${top}%;">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 col-lg-6">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-addon" id="sizing-addon1">Place</span>
+                    <input type="text" class="form-control" placeholder="Place name...">
+                </div>
+                <div repeat.for="location of locations">
+                    <ul>
+                        <li>${loc.adminAreaType1}: ${loc.adminArea1}</li>
+                        <li>${loc.adminAreaType2}: ${loc.adminArea2}</li>
+                        <li>${loc.adminAreaType3}: ${loc.adminArea3}</li>
+                        <li>${loc.adminAreaType4}: ${loc.adminArea4}</li>
+                        <li>${loc.adminAreaType5}: ${loc.adminArea5}</li>
+                        <li>${loc.adminAreaType6}: ${loc.adminArea6}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="back-button">
+            <button class="map-button btn" css="display: ${display}" click.delegate="hide()">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </button>
+        </div>
+    </div>
+</template>

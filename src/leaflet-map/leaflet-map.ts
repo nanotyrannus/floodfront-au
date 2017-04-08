@@ -7,8 +7,8 @@ import { Marker } from "leaflet"
 import { MarkerNoteCustomElement } from "./marker-note/marker-note"
 import { NavigationService } from "../navigation/navigation-service"
 import { EventAggregator } from "aurelia-event-aggregator"
-import { PlaceSearch } from "../place-search/place-search"
 import { InformationCustomElement } from "../resources/elements/information"
+import { SearchCustomElement } from "../resources/elements/search/search"
 import { child } from "aurelia-framework"
 
 @autoinject
@@ -23,6 +23,7 @@ export class LeafletMap {
     private placeQuery: string
     private searchText = "Search text"
     @child('information') private info: InformationCustomElement
+    @child('search') private search: SearchCustomElement
 
     constructor(
         private router: Router,
@@ -31,8 +32,7 @@ export class LeafletMap {
         private markerNote: MarkerNoteCustomElement,
         // private info: InformationCustomElement,
         private eventAggregator: EventAggregator,
-        private nav: NavigationService,
-        private search: PlaceSearch) {
+        private nav: NavigationService) {
 
         this.eventAggregator.subscribe("marker-note", data => {
             console.log(data)
@@ -387,16 +387,21 @@ export class LeafletMap {
             this.leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 18)
         } catch (e) {
             console.log("centerMap something went wrong")
+            console.warn(e)
         }
     }
 
-    private async query(event: KeyboardEvent) {
-        // For now, navigate to first result.
-        if (event.which === 13) {
-            let result = await this.search.search(this.placeQuery)
-            this.placeQuery = ""
-            this.leafletMap.setView(result[0].latLng, 15)
-        }
+    // private async query(event: KeyboardEvent) {
+    //     // For now, navigate to first result.
+    //     if (event.which === 13) {
+    //         let result = await this.search.search(this.placeQuery)
+    //         this.placeQuery = ""
+    //         this.leafletMap.setView(result[0].latLng, 15)
+    //     }
+    // }
+
+    private showSearch() {
+        this.search.show()
     }
 
 }
