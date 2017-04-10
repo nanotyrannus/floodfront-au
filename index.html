@@ -13,6 +13,7 @@
   <script src="node_modules/please-wait/build/please-wait.min.js"></script>
   <script type="text/javascript">
   window.loading_screen = { finish: function(){} }
+  window.pleaseWait = function() { return function() {} }
     // window.loading_screen = window.pleaseWait({
     //   logo: "assets/images/blank.svg",
     //   backgroundColor: '#2e589b',
