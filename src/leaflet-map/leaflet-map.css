@@ -63,26 +63,33 @@
 
 @media (min-width: 768px) {
     .map-button {
-        width: 4em;
-        height: 4em;
-    }
-
-}
-
-@media (min-width:992px) {
-    .map-button {
-        width: 4em;
-        height: 4em;
-    }
-}
-
-@media (min-width: 1200px) {
-    .map-button {
         width: 5em;
         height: 5em;
     }
 
     .location-button {
         bottom: 14%;
+    }
+}
+
+@media (min-width:992px) {
+    .map-button {
+        width: 6em;
+        height: 6em;
+    }
+
+    .location-button {
+        bottom: 15%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .map-button {
+        width: 8em;
+        height: 8em;
+    }
+
+    .location-button {
+        bottom: 17%;
     }
 }
