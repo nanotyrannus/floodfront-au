@@ -72,7 +72,10 @@
           ],
           "stub": true
         }
-      ]
+      ],
+      "config" : {
+        "waitSeconds" : 999
+      }
     },
     "options": {
       "minify": "stage & prod",
