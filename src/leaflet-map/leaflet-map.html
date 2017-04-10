@@ -29,9 +29,10 @@
     <marker-note></marker-note>
 
     <div class="place-search-input-container">
-        <button click.delegate="showSearch()">
-            <span class="glyphicon glyphicon-search"></span>
+        <button click.delegate="search.show()" if.bind="!search.isActive">
+            <span class="glyphicon glyphicon-search" ></span>
         </button>
+        <button click.delegate="search.hide()" if.bind="search.isActive">HIDE</button>
         <!--<input type="text" value.bind="placeQuery" keyup.delegate="query($event)" placeholder.bind="searchText">-->
     </div>
     <information></information>
