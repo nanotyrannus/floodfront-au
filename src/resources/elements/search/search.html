@@ -6,17 +6,22 @@
             <div class="col-md-6 col-sm-6 col-lg-6">
                 <div class="input-group input-group-lg">
                     <span class="input-group-addon" id="sizing-addon1">Place</span>
-                    <input type="text" class="form-control" placeholder="Place name...">
+                    <input type="text" class="form-control" placeholder="Place name..." value.bind="searchString">
+                    <span class="input-group-btn">
+                            <button class="btn btn-default" disabled.bind="email.length < 1" click.delegate="search(searchString)">SEARCH</button>
+                        </span>
                 </div>
-                <div repeat.for="location of locations">
+                <div repeat.for="location of locations" class="search-result-container">
+                    <div click.delegate="select(location.latLng)">
                     <ul>
-                        <li>${loc.adminAreaType1}: ${loc.adminArea1}</li>
-                        <li>${loc.adminAreaType2}: ${loc.adminArea2}</li>
-                        <li>${loc.adminAreaType3}: ${loc.adminArea3}</li>
-                        <li>${loc.adminAreaType4}: ${loc.adminArea4}</li>
-                        <li>${loc.adminAreaType5}: ${loc.adminArea5}</li>
-                        <li>${loc.adminAreaType6}: ${loc.adminArea6}</li>
+                        <li if.bind="location.adminArea1">${location.adminArea1Type}: ${location.adminArea1}</li>
+                        <li if.bind="location.adminArea2">${location.adminArea2Type}: ${location.adminArea2}</li>
+                        <li if.bind="location.adminArea3">${location.adminArea3Type}: ${location.adminArea3}</li>
+                        <li if.bind="location.adminArea4">${location.adminArea4Type}: ${location.adminArea4}</li>
+                        <li if.bind="location.adminArea5">${location.adminArea5Type}: ${location.adminArea5}</li>
+                        <li if.bind="location.adminArea6">${location.adminArea6Type}: ${location.adminArea6}</li>
                     </ul>
+                    </div>
                 </div>
             </div>
         </div>

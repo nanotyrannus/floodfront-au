@@ -147,6 +147,12 @@ export class LeafletMap {
             // marker.addTo(this.leafletMap)
         })
 
+        // Search service listen
+        this.eventAggregator.subscribe("search-select", (latlng: L.LatLng) => {
+            console.log(`LeafletMap received search-selct`, latlng)
+            this.leafletMap.setView(latlng, 18)
+        })
+
         this.centerMap()
     }
 

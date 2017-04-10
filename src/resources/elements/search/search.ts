@@ -1,13 +1,16 @@
 import { autoinject } from "aurelia-framework"
+import { EventAggregator } from "aurelia-event-aggregator"
 import { SearchService } from "../../../search-service/search-service"
 
+@autoinject
 export class SearchCustomElement {
     private top: number
     private display: string
     private _isActive: boolean
     private locations: any[]
+    private searchString: string
 
-    constructor(private searchService: SearchService) {
+    constructor(private searchService: SearchService, private ea: EventAggregator) {
         this.top = 100
         this.display = "none"
         this._isActive = false
@@ -15,6 +18,12 @@ export class SearchCustomElement {
 
     public async search(query: string) {
         this.locations = await this.searchService.search(query)
+    }
+
+    public select(latlng: any) {
+        this.ea.publish("search-select", latlng)
+        this.hide()
+        console.log("SearchService#select", latlng)
     }
 
     public show() {
