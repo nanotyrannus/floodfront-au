@@ -15,8 +15,23 @@
 /* Overriding leaflet class */
 .leaflet-control-zoom {
     position: fixed !important;
-    bottom: 20%;
+    bottom: 40%;
     right: 10px;
+}
+
+.leaflet-control-layers-toggle {
+    width: 55px !important;
+    height: 55px !important;
+}
+
+.leaflet-control-zoom-in {
+    width: 55px !important;
+    height: 55px !important;
+}
+
+.leaflet-control-zoom-out {
+    width: 55px !important;
+    height: 55px !important;
 }
 
 .back-button {
@@ -27,8 +42,8 @@
 }
 
 .map-button {
-    height: 3em;
-    width: 3em;
+    height: 4em;
+    width: 4em;
     color: #FFFFFF;
     border: none;
     background-color: #d3d3d3;
@@ -48,8 +63,8 @@
 
 @media (min-width: 768px) {
     .map-button {
-        width: 3.5em;
-        height: 3.5em;
+        width: 4em;
+        height: 4em;
     }
 
 }
