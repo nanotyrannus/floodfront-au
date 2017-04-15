@@ -1,6 +1,6 @@
 <template>
     <require from="login/login.css"></require>
-    <div class="login-component-container vertical-center container">
+    <div class="login-component-container vertical-center container-fluid">
         <div class="container">
             <div class="row">
                 <div class="col-md-12 col-xs-12 col-lg-12">
@@ -18,9 +18,6 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="login-container" style="width:100%;">
                         <div class="input-group input-group-lg" style="width: 75%; margin: 0 auto;">
-                            <span class="input-group-addon">
-                            <span class="glyphicon glyphicon-envelope"></span>
-                            </span>
                             <input type="text" keyup.delegate="login($event)" class="form-control " placeholder="Email" value.bind="email">
                             <span class="input-group-btn">
                             <button class="btn btn-default" disabled.bind="email.length < 1" click.delegate="login($event)">ENTER</button>
