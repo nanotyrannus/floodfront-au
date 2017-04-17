@@ -9,6 +9,7 @@ import { NavigationService } from "../navigation/navigation-service"
 import { EventAggregator } from "aurelia-event-aggregator"
 import { InformationCustomElement } from "../resources/elements/information"
 import { SearchCustomElement } from "../resources/elements/search/search"
+import { MatthewFilterCustomElement } from "../resources/elements/matthew-filter/matthew-filter"
 import { child } from "aurelia-framework"
 
 @autoinject
@@ -72,7 +73,7 @@ export class LeafletMap {
             "doubleClickZoom": false
         })
 
-        var matthewTiles = ["https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161007aOblique/{z}/{x}/{y}.png"
+        var matthewTileUrls = ["https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161007aOblique/{z}/{x}/{y}.png"
             , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161008aOblique/{z}/{x}/{y}.png"
             , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161008bOblique/{z}/{x}/{y}.png"
             , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161009aOblique/{z}/{x}/{y}.png"
@@ -84,11 +85,11 @@ export class LeafletMap {
             , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161016_RGB/{z}/{x}/{y}.png"]
         let matthewOptions = { tileSize: 256, minZoom: 1, maxZoom: 19, type: 'xyz' }
 
-        let matthewLayer = L.layerGroup(
-            matthewTiles.map(tileString => {
-                return L.tileLayer(tileString, matthewOptions)
-            })
-        ).eachLayer(layer => {
+        let matthewTileLayers = matthewTileUrls.map(tileString => {
+            return L.tileLayer(tileString, matthewOptions)
+        })
+
+        let matthewLayer = L.layerGroup(matthewTileLayers).eachLayer(layer => {
             (layer as any).bringToFront()
         })
 
