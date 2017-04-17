@@ -2,10 +2,12 @@
     position: fixed;
     top: 3%;
     left: 3%;
-    padding: 1%;
-    z-index: 400;
+    z-index: 1002;
     background-color: white;
-    opacity: 0.3;
+}
+
+.glyphicon {
+    font-size: 1.5em;
 }
 
 .place-search-input-container:hover {
