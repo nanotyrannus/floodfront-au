@@ -1,6 +1,7 @@
 import { Router } from "aurelia-router"
 import { RestService } from "../rest/rest-service"
 import { UserService } from "../user/user-service"
+import { CookieService } from "../cookie/cookie-service"
 import { autoinject } from "aurelia-framework"
 import { MarkerModel, MarkerType } from "./MarkerModel"
 import { Marker } from "leaflet"
@@ -25,6 +26,7 @@ export class LeafletMap {
     private searchText = "Search text"
     @child('information') private info: InformationCustomElement
     @child('search') private search: SearchCustomElement
+    @child('matthew-filter') private matthew: MatthewFilterCustomElement
 
     constructor(
         private router: Router,
@@ -33,7 +35,8 @@ export class LeafletMap {
         private markerNote: MarkerNoteCustomElement,
         // private info: InformationCustomElement,
         private eventAggregator: EventAggregator,
-        private nav: NavigationService) {
+        private nav: NavigationService,
+        private cookie: CookieService) {
 
         this.eventAggregator.subscribe("marker-note", data => {
             console.log(data)
@@ -67,9 +70,13 @@ export class LeafletMap {
             }
         }
 
+        if (!this.cookie.get("last_location")) {
+            this.cookie.set("last_location", JSON.stringify({ "lat": 34.2049, "lng": -118.1641 }))
+        }
+
         this.leafletMap = L.map("map", {
             "zoom": 18,
-            "center": [0, 0],
+            "center": JSON.parse(this.cookie.get("last_location")),
             "doubleClickZoom": false
         })
 
@@ -88,6 +95,16 @@ export class LeafletMap {
         let matthewTileLayers = matthewTileUrls.map(tileString => {
             return L.tileLayer(tileString, matthewOptions)
         })
+
+        /**
+         * BUG! When reloading the page on /map, this line works.
+         * However, |this.matthew| is not defined when navigating
+         * to this view from another view. Waiting until the next
+         * process tick fixes this for some reason.
+         */
+        setTimeout(() => {
+            this.matthew.init(matthewTileLayers, this.leafletMap)
+        }, 0)
 
         let matthewLayer = L.layerGroup(matthewTileLayers).eachLayer(layer => {
             (layer as any).bringToFront()
@@ -131,6 +148,10 @@ export class LeafletMap {
             // this.popup.hide()
             // this.popup.isVisible = false
             console.log("dragstart")
+        })
+
+        this.leafletMap.on("dragend", (event) => {
+            this.cookie.set("last_location", JSON.stringify((<any>this.leafletMap).getBounds()._northEast))
         })
 
         this.leafletMap.on('click', (event: any) => {

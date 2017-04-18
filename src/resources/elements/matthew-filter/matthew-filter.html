@@ -1,6 +1,16 @@
 <template>
     <require from="./matthew-filter.css"></require>
-    <div class="matthew-filter-container">
-        MATTHEW FILTER
+    <div class="matthew-filter-container" css="top: ${top}%;">
+        <div style="padding: 1%;" repeat.for="layer of layerWrapper">
+            <button class="btn btn-info btn-block btn-lg" click.delegate="layer.toggle()">
+                <span if.bind="layer.isVisible" class="glyphicon glyphicon-check"></span>
+                ${layer.date}
+            </button>
+        </div>
+    </div>
+    <div if.bind="isActive" class="back-button-container">
+        <button click.delegate="hide()">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </button>
     </div>
 </template>
