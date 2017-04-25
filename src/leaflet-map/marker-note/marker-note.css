@@ -5,3 +5,17 @@
 .marker-visible {
     display: block;
 }
+
+.marker-note-container {
+    z-index: 402;
+    width: 80%;
+    height: 50%;
+    position: fixed;
+    background-color: white;
+    right: 0;
+    left: 0;
+    top: 25%;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 1%;
+}

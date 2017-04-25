@@ -74,8 +74,12 @@ export class LeafletMap {
             this.cookie.set("last_location", JSON.stringify({ "lat": 34.2049, "lng": -118.1641 }))
         }
 
+        if (!this.cookie.get("last_zoom_level")) {
+            this.cookie.set("last_zoom_level", "18")
+        }
+
         this.leafletMap = L.map("map", {
-            "zoom": 18,
+            "zoom": parseInt(this.cookie.get("last_zoom_level"), 10),
             "center": JSON.parse(this.cookie.get("last_location")),
             "doubleClickZoom": false
         })
@@ -151,8 +155,18 @@ export class LeafletMap {
         })
 
         this.leafletMap.on("dragend", (event) => {
-            this.cookie.set("last_location", JSON.stringify((<any>this.leafletMap).getBounds()._northEast))
+            let bounds: any = this.leafletMap.getBounds()
+            let center = {
+                "lat" : (bounds._northEast.lat + bounds._southWest.lat) / 2,
+                "lng" : (bounds._northEast.lng + bounds._southWest.lng) / 2
+            }
+            // this.cookie.set("last_location", JSON.stringify((<any>this.leafletMap).getBounds()._northEast))
+            this.cookie.set("last_location", JSON.stringify(center))
         })
+
+        this.leafletMap.on("zoomend", (event => {
+            this.cookie.set("last_zoom_level", `${this.leafletMap.getZoom()}`)
+        }))
 
         this.leafletMap.on('click', (event: any) => {
 
@@ -175,7 +189,9 @@ export class LeafletMap {
             this.leafletMap.setView(latlng, 18)
         })
 
-        this.centerMap()
+        if (!this.cookie.get("last_location")) {
+            this.centerMap()
+        }
     }
 
     private spawnMarker(latlng: any, type: MarkerType = null, oldMarker: any = null) {

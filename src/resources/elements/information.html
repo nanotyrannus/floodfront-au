@@ -1,7 +1,7 @@
 <template>
     <require from="./information.css"></require>
     <div class="marker-menu-container" css="visibility: ${visibility};">
-        <div>
+        <!--<div>
             <img class="marker-icon" style="height: 25%;" src="/assets/images/marker_walkable.svg">
             <span>Not Flooded</span>
         </div>
@@ -12,9 +12,60 @@
         <div>
             <img class="marker-icon" style="height: 25%;" src="/assets/images/marker_flood.svg">
             <span>Flooded</span>
+        </div>-->
+        <div class="animation-container">
+            <div id="page-2" if.bind="currentPage === 2">
+                <img class="tutorial-image" src="assets/images/tutorial_marker_buttons.png">
+                <div id="finger-page-2">
+                    <img src="assets/images/fingerpoint.svg">
+                </div>
+            </div>
+            <div id="page-1" if.bind="currentPage === 1">
+                <div>
+                    <img class="tutorial-image" src="assets/images/tutorial_marker_buttons.png">
+                </div>
+            </div>
+            <div id="page-3" if.bind="currentPage === 3">
+                <div>
+                    <img class="tutorial-image" src="assets/images/tutorial_location.png">
+                </div>
+            </div>
+            <div id="page-4" if.bind="currentPage === 4">
+                <div>
+                    <img class="tutorial-image" src="assets/images/tutorial_search.png">
+                </div>
+            </div>
+            <div id="page-5" if.bind="currentPage === 5">
+                <div>
+                    <!--<img class="tutorial-image" src="assets/images/fingerpoint.svg">-->
+                </div>
+            </div>
         </div>
-        <button class="btn btn-default" click.delegate="toggle()">CLOSE</button>
-        <button class="btn btn-default" click.delegate="toggleAndSave()">DON'T SHOW AGAIN</button>
+        <div class="tutorial-text-container">
+            <div class="marker-menu-text" if.bind="currentPage == 1">
+                <h2>Types of markers</h2>
+                <p>Flood markers (blue) are placed on areas of flood. Terrain markers (yellow) are for land. Border markers
+                    (cyan) are for flood borders.</p>
+            </div>
+            <div class="marker-menu-text" if.bind="currentPage == 2">
+                <h2>Placing a marker</h2>
+                <p>To place a marker, select one of the colored icons from the bottom right, then tap a place on the map.</p>
+            </div>
+            <div class="marker-menu-text" if.bind="currentPage == 3">
+                <h2>Finding your location</h2>
+                <p>Clicking on the crosshair icon will center the map on your location.</p>
+            </div>
+            <div class="marker-menu-text" if.bind="currentPage == 4">
+                <h2>Searching for a location</h2>
+                <p>Click this icon to find a location by its name.</p>
+            </div>
+            <div class="marker-menu-text" if.bind="currentPage == 5">
+                <h2>That's it!</h2>
+                <button class="btn btn-default" if.bind="currentPage === lastPage" click.delegate="toggle()">CLOSE</button>
+                <button class="btn btn-default" if.bind="currentPage === lastPage" click.delegate="toggleAndSave()">DON'T SHOW AGAIN</button>
+            </div>
+        </div>
+        <button class="btn btn-default" disabled.bind="!(currentPage > 1)" click.delegate="prevPage()">PREV</button>
+        <button class="btn btn-default" disabled.bind="currentPage === lastPage" click.delegate="nextPage()">NEXT</button>
     </div>
-    <div class="marker-menu-text"></div>
 </template>

@@ -4,6 +4,8 @@ import { EventAggregator } from "aurelia-event-aggregator"
 
 @autoinject()
 export class InformationCustomElement {
+    private currentPage = 1
+    private lastPage = 5 // Inclusive, page number of final page.
     private name = "Information"
     @bindable({ defaultBindingMode: bindingMode.twoWay }) private myStyle = "visibility : visible;"
     private isVisible = false
@@ -21,12 +23,25 @@ export class InformationCustomElement {
         }
     }
 
+    public nextPage(): void {
+        if (this.currentPage < this.lastPage) {
+            this.currentPage++
+        }
+    }
+
+    public prevPage(): void {
+        if (this.currentPage > 1) {
+            this.currentPage--
+        }
+    }
+
     public toggle() {
         console.log("information#toggle called", this.myStyle)
         this.isVisible = !this.isVisible
         if (this.isVisible) {
             this.visibility = "visible"
         } else {
+            this.currentPage = 1 // Set to first page in case re-opened
             this.visibility = "hidden"
         }
     }
@@ -36,3 +51,4 @@ export class InformationCustomElement {
         this.toggle()
     }
 }
+
