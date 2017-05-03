@@ -70,128 +70,18 @@ export class LeafletMap {
             }
         }
 
+        this.nav.initialize()
+        this.configureMap()
+
         if (!this.cookie.get("last_location")) {
             this.cookie.set("last_location", JSON.stringify({ "lat": 34.2049, "lng": -118.1641 }))
+            this.centerMap()
         }
 
         if (!this.cookie.get("last_zoom_level")) {
             this.cookie.set("last_zoom_level", "18")
         }
 
-        this.leafletMap = L.map("map", {
-            "zoom": parseInt(this.cookie.get("last_zoom_level"), 10),
-            "center": JSON.parse(this.cookie.get("last_location")),
-            "doubleClickZoom": false
-        })
-
-        var matthewTileUrls = ["https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161007aOblique/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161008aOblique/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161008bOblique/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161009aOblique/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161010aOblique/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161011_RGB/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161013_RGB/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161014_RGB/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161015_RGB/{z}/{x}/{y}.png"
-            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161016_RGB/{z}/{x}/{y}.png"]
-        let matthewOptions = { tileSize: 256, minZoom: 1, maxZoom: 19, type: 'xyz' }
-
-        let matthewTileLayers = matthewTileUrls.map(tileString => {
-            return L.tileLayer(tileString, matthewOptions)
-        })
-
-        /**
-         * BUG! When reloading the page on /map, this line works.
-         * However, |this.matthew| is not defined when navigating
-         * to this view from another view. Waiting until the next
-         * process tick fixes this for some reason.
-         */
-        setTimeout(() => {
-            this.matthew.init(matthewTileLayers, this.leafletMap)
-        }, 0)
-
-        let matthewLayer = L.layerGroup(matthewTileLayers).eachLayer(layer => {
-            (layer as any).bringToFront()
-        })
-
-        // L.control.layers(null, { "Matthew": matthewLayer }).addTo(this.leafletMap)
-        let simpleLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/cj0kywrdm001n2smyhddxb7wb/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
-            // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-            maxZoom: 19,
-            id: 'your.mapbox.project.id',
-            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
-        })
-
-        let satelliteLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/ciye7ibx9000l2sk6v4n5bx3n/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
-            // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-            maxZoom: 19,
-            id: 'your.mapbox.project.id',
-            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
-        })
-
-        let baseMaps = {
-            "Simple": simpleLayer,
-            "Satellite": satelliteLayer
-        }
-
-        let overlayMaps = {
-            "Matthew": matthewLayer
-        }
-        if (this.userService.mode === "desktop") {
-            simpleLayer.addTo(this.leafletMap)
-            matthewLayer.addTo(this.leafletMap)
-        } else {
-            satelliteLayer.addTo(this.leafletMap)
-        }
-
-        L.control.layers(baseMaps, overlayMaps).addTo(this.leafletMap)
-
-        // this.initiateNavigation
-
-        this.leafletMap.on("dragstart", event => {
-            // this.popup.hide()
-            // this.popup.isVisible = false
-            console.log("dragstart")
-        })
-
-        this.leafletMap.on("dragend", (event) => {
-            let bounds: any = this.leafletMap.getBounds()
-            let center = {
-                "lat" : (bounds._northEast.lat + bounds._southWest.lat) / 2,
-                "lng" : (bounds._northEast.lng + bounds._southWest.lng) / 2
-            }
-            // this.cookie.set("last_location", JSON.stringify((<any>this.leafletMap).getBounds()._northEast))
-            this.cookie.set("last_location", JSON.stringify(center))
-        })
-
-        this.leafletMap.on("zoomend", (event => {
-            this.cookie.set("last_zoom_level", `${this.leafletMap.getZoom()}`)
-        }))
-
-        this.leafletMap.on('click', (event: any) => {
-
-            if (this.primed) {
-                this.primed = false
-            } else {
-                return
-            }
-
-            this.spawnMarker(event.latlng)
-
-            console.log(`placed marker at ${event.latlng.lat}, ${event.latlng.lng}`)
-
-            // marker.addTo(this.leafletMap)
-        })
-
-        // Search service listen
-        this.eventAggregator.subscribe("search-select", (latlng: L.LatLng) => {
-            console.log(`LeafletMap received search-selct`, latlng)
-            this.leafletMap.setView(latlng, 18)
-        })
-
-        if (!this.cookie.get("last_location")) {
-            this.centerMap()
-        }
     }
 
     private spawnMarker(latlng: any, type: MarkerType = null, oldMarker: any = null) {
@@ -317,8 +207,130 @@ export class LeafletMap {
         marker.addTo(this.leafletMap)
     }
 
+    private configureMap() {
+        this.leafletMap = L.map("map", {
+            "zoom": parseInt(this.cookie.get("last_zoom_level"), 10),
+            "center": JSON.parse(this.cookie.get("last_location")),
+            "doubleClickZoom": false
+        })
+
+
+        var matthewTileUrls = [
+            "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161007aOblique/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161008aOblique/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161008bOblique/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161009aOblique/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161010aOblique/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161011_RGB/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161013_RGB/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161014_RGB/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161015_RGB/{z}/{x}/{y}.png"
+            , "https://geodesy.noaa.gov/storm_archive/storms/tilesb/services/tileserver.php/20161016_RGB/{z}/{x}/{y}.png"
+        ]
+        let matthewOptions = { tileSize: 256, minZoom: 1, maxZoom: 19, type: 'xyz' }
+
+        let matthewTileLayers = matthewTileUrls.map(tileString => {
+            return L.tileLayer(tileString, matthewOptions)
+        })
+
+        /**
+         * BUG! When reloading the page on /map, this line works.
+         * However, |this.matthew| is not defined when navigating
+         * to this view from another view. Waiting until the next
+         * process tick fixes this for some reason.
+         */
+        setTimeout(() => {
+            this.matthew.init(matthewTileLayers, this.leafletMap)
+        }, 0)
+
+        let matthewLayer = L.layerGroup(matthewTileLayers).eachLayer(layer => {
+            (layer as any).bringToFront()
+        })
+
+        // L.control.layers(null, { "Matthew": matthewLayer }).addTo(this.leafletMap)
+        let simpleLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/cj0kywrdm001n2smyhddxb7wb/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
+            // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 19,
+            id: 'your.mapbox.project.id',
+            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
+        })
+
+        let satelliteLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/ciye7ibx9000l2sk6v4n5bx3n/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
+            // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 19,
+            id: 'your.mapbox.project.id',
+            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
+        })
+
+        let baseMaps = {
+            "Simple": simpleLayer,
+            "Satellite": satelliteLayer
+        }
+
+        let overlayMaps = {
+            "Matthew": matthewLayer
+        }
+        if (this.userService.mode === "desktop") {
+            simpleLayer.addTo(this.leafletMap)
+            matthewLayer.addTo(this.leafletMap)
+        } else {
+            satelliteLayer.addTo(this.leafletMap)
+        }
+
+        L.control.layers(baseMaps, overlayMaps).addTo(this.leafletMap)
+
+        // this.initiateNavigation
+
+        this.leafletMap.on("moveend", event => {
+            // console.log(`moveend event`, event)
+            this.cookie.set("last_location", JSON.stringify(this.getCenter()))
+        })
+        this.leafletMap.on("dragstart", event => {
+            // this.popup.hide()
+            // this.popup.isVisible = false
+            console.log("dragstart")
+        })
+
+        this.leafletMap.on("dragend", (event) => {
+            let center = this.getCenter()
+            // this.cookie.set("last_location", JSON.stringify((<any>this.leafletMap).getBounds()._northEast))
+            this.cookie.set("last_location", JSON.stringify(center))
+        })
+
+        this.leafletMap.on("zoomend", (event => {
+            this.cookie.set("last_zoom_level", `${this.leafletMap.getZoom()}`)
+        }))
+
+        this.leafletMap.on('click', (event: any) => {
+
+            if (this.primed) {
+                this.primed = false
+            } else {
+                return
+            }
+
+            this.spawnMarker(event.latlng)
+
+            console.log(`placed marker at ${event.latlng.lat}, ${event.latlng.lng}`)
+
+            // marker.addTo(this.leafletMap)
+        })
+
+        // Search service listen
+        this.eventAggregator.subscribe("search-select", (latlng: L.LatLng) => {
+            console.log(`LeafletMap received search-selct`, latlng)
+            this.leafletMap.setView(latlng, 18)
+        })
+    }
+
     goBack() {
         this.router.navigate("mode")
+    }
+
+    private getCenter(): L.LatLng {
+        let bounds: any = this.leafletMap.getBounds()
+        let center = L.latLng((bounds._northEast.lat + bounds._southWest.lat) / 2, (bounds._northEast.lng + bounds._southWest.lng) / 2)
+        return center
     }
 
     private async getMarkers() {
@@ -430,7 +442,7 @@ export class LeafletMap {
             console.log(pos)
             this.leafletMap.setView([pos.coords.latitude, pos.coords.longitude], 18)
         } catch (e) {
-            console.log("centerMap something went wrong")
+            console.warn(`Couldn't finish #centerMap`)
             console.warn(e)
         }
     }
