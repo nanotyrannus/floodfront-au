@@ -70,9 +70,6 @@ export class LeafletMap {
             }
         }
 
-        this.nav.initialize()
-        this.configureMap()
-
         if (!this.cookie.get("last_location")) {
             this.cookie.set("last_location", JSON.stringify({ "lat": 34.2049, "lng": -118.1641 }))
             this.centerMap()
@@ -81,6 +78,10 @@ export class LeafletMap {
         if (!this.cookie.get("last_zoom_level")) {
             this.cookie.set("last_zoom_level", "18")
         }
+
+        this.nav.initialize()
+        this.configureMap()
+
 
     }
 
