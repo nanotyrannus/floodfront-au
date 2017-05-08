@@ -1,14 +1,21 @@
 import { autoinject } from "aurelia-framework"
+import { EventAggregator } from "aurelia-event-aggregator"
 
+@autoinject
 export class MatthewFilterCustomElement {
 
     public isActive: boolean
     private top: number
     private layerWrapper: LayerWrapper[]
 
-    construtor() {
+    constructor(private ea: EventAggregator) {
         this.top = 100
         this.isActive = false
+        this.ea.subscribe("keyboard-event", (event) => {
+            if (event === "escape") {
+                this.hide()
+            }
+        })
     }
 
     public init(layers: L.TileLayer[], leafletRef: L.Map) {
@@ -59,4 +66,6 @@ class LayerWrapper {
         })
         this.isVisible = !this.isVisible
     }
+
+
 }

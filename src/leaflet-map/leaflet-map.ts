@@ -264,7 +264,7 @@ export class LeafletMap {
         })
 
         let baseMaps = {
-            "Simple": simpleLayer,
+            "Map": simpleLayer,
             "Satellite": satelliteLayer
         }
 
@@ -278,7 +278,7 @@ export class LeafletMap {
             satelliteLayer.addTo(this.leafletMap)
         }
 
-        L.control.layers(baseMaps, overlayMaps).addTo(this.leafletMap)
+        L.control.layers(baseMaps).addTo(this.leafletMap)
 
         // this.initiateNavigation
 

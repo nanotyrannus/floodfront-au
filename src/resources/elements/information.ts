@@ -21,6 +21,11 @@ export class InformationCustomElement {
         } else if (this.showOnCreate === "show") {
             this.toggle()
         }
+        this.ea.subscribe("keyboard-event", event => {
+            if (event === "escape" && this.isVisible) {
+                this.toggle()
+            }
+        })
     }
 
     public nextPage(): void {

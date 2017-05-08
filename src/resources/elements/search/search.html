@@ -5,7 +5,7 @@
             <div class="col-sm-1"></div>
             <div class="col-md-12 col-sm-12 col-lg-12">
                 <div class="input-group input-group-lg">
-                    <input type="text" class="form-control" keyup.delegate="keypressListener($event)" placeholder="Place name..." value.bind="searchString">
+                    <input type="text" class="form-control" keyup.delegate="keypressListener($event)" focus.bind="hasFocus" placeholder="Place name..." value.bind="searchString">
                     <span class="input-group-btn">
                             <button class="btn btn-default" disabled.bind="email.length < 1" click.delegate="search(searchString)">SEARCH</button>
                         </span>

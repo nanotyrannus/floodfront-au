@@ -1,5 +1,6 @@
 <template>
     <require from="./information.css"></require>
+    <div class="exit-pane" css="visibility: ${visibility}" click.delegate="toggle()"></div>
     <div class="marker-menu-container" css="visibility: ${visibility};">
         <div class="animation-container">
             <div id="page-2" class="tutorial-page" if.bind="currentPage === 2">
