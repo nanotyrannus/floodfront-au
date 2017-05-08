@@ -24,6 +24,9 @@ export class LeafletMap {
     private files: Map<any, File> = new Map<any, File>()
     private placeQuery: string
     private searchText = "Search text"
+    private isSatelliteLayer: boolean
+    private simpleLayer: any
+    private satelliteLayer: any
     @child('information') private info: InformationCustomElement
     @child('search') private search: SearchCustomElement
     @child('matthew-filter') private matthew: MatthewFilterCustomElement
@@ -278,7 +281,17 @@ export class LeafletMap {
             satelliteLayer.addTo(this.leafletMap)
         }
 
-        L.control.layers(baseMaps).addTo(this.leafletMap)
+        this.simpleLayer = simpleLayer
+        this.satelliteLayer = satelliteLayer
+
+        this.leafletMap.addLayer(this.satelliteLayer)
+        this.isSatelliteLayer = true
+        if (this.userService.mode === "desktop") {
+            this.toggleBaseMap()
+            // this.isSatelliteLayer = false
+        }
+
+        // L.control.layers(baseMaps).addTo(this.leafletMap)
 
         // this.initiateNavigation
 
@@ -420,7 +433,7 @@ export class LeafletMap {
     private upload(markerId: number) {
         let formData = new FormData()
         formData.append("image", this.files.get(markerId))
-        formData.append("marker_id", markerId)
+        formData.append("marker_id", String(markerId))
         let xhr = new XMLHttpRequest()
         xhr.open("POST", `${"https:"}//${"floodfront.net"}:8080/upload`)
         xhr.send(formData)
@@ -431,6 +444,17 @@ export class LeafletMap {
 
     private toggleInfo() {
         this.info.toggle()
+    }
+
+    private toggleBaseMap() {
+        if (this.isSatelliteLayer) {
+            this.leafletMap.removeLayer(this.satelliteLayer)
+            this.leafletMap.addLayer(this.simpleLayer)
+        } else {
+            this.leafletMap.removeLayer(this.simpleLayer)
+            this.leafletMap.addLayer(this.satelliteLayer)
+        }
+        this.isSatelliteLayer = !this.isSatelliteLayer
     }
 
     /**
