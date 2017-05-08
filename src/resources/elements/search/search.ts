@@ -26,6 +26,13 @@ export class SearchCustomElement {
         console.log("SearchService#select", latlng)
     }
 
+    private keypressListener(event: KeyboardEvent) {
+        // console.log(event)
+        if (event.which === 13) {
+            this.search(this.searchString)
+        }
+    }
+
     public show() {
         this.top = 0
         this.display = "block"

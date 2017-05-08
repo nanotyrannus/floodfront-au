@@ -437,7 +437,7 @@ export class LeafletMap {
      * Centers map on user location using GPS Navigation.
      */
     private async centerMap() {
-        // TODO r
+        console.log(`leaflet-map#centerMap called`)
         try {
             let pos: any = await this.nav.getCurrentPosition()
             console.log(pos)

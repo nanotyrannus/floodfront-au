@@ -7,13 +7,34 @@ body, html {
     background-color: #2e589b;
 }
 
-@media (max-width: 400) {
+@media (min-width: 300px) {
+    h1 {}
+    h2 {}
+    div, span, p, .text-btn {
+        font-size: 1em;
+    }
     span.login-title {
-        font-size: 3em;
+        font-size: 3.5em;
     }
 }
 
-@media (max-width: 800) {
+@media (min-width: 768px) {
+    h1 {}
+    h2 {}
+    div, span, p, .text-btn {
+        font-size: 1.2em;
+    }
+    span.login-title {
+        font-size: 5em;
+    }
+}
+
+@media (min-width: 1024px) {
+    h1 {}
+    h2 {}
+    div, span, p, .text-btn {
+        font-size: 1.2em;
+    }
     span.login-title {
         font-size: 5em;
     }
