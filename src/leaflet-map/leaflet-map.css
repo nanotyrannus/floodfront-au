@@ -50,15 +50,15 @@
 
 @media (min-width: 1024px) {
     .leaflet-control-zoom-in, .leaflet-control-zoom-out {
-        width: 120px !important;
-        height: 120px !important;
-        line-height: 120px !important;
-        font-size: 55px !important; 
+        width: 80px !important;
+        height: 80px !important;
+        line-height: 80px !important;
+        font-size: 40px !important; 
     }
 
     .map-switch {
-        width: 200px;
-        height: 200px;
+        width: 150px;
+        height: 150px;
     }
 }
 
@@ -85,13 +85,15 @@
 .map-button-container {
     z-index: 401;
     position: absolute;
-    bottom: 50px;
+    /*bottom: 50px;*/
     right: 10px;
 }
 
 .location-button {
-    bottom: 12%;
-    right: 10px;
+    /*bottom: 12%;*/
+    /*right: 10px;*/
+    width: 4em;
+    height: 4em;
 }
 
 .filter-button-container {
@@ -101,14 +103,16 @@
     position: fixed;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 300px) {
     .map-button {
-        width: 5em;
-        height: 5em;
+        width: 4em;
+        height: 4em;
     }
 
     .location-button {
-        bottom: 14%;
+        bottom: 17%;
+        width: 4em;
+        height: 4em;
     }
 }
 
@@ -119,7 +123,9 @@
     }
 
     .location-button {
-        bottom: 15%;
+        bottom: 17%;
+        width: 6em;
+        height: 6em;
     }
 }
 
@@ -131,5 +137,7 @@
 
     .location-button {
         bottom: 17%;
+        width: 8em;
+        height: 8em;
     }
 }

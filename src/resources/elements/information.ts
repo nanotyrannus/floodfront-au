@@ -14,13 +14,13 @@ export class InformationCustomElement {
 
     constructor(private ea: EventAggregator, private cookies: CookieService) {
         console.log("Information created")
-        this.showOnCreate = this.cookies.get("on-create-info")
-        if (!this.showOnCreate) {
-            this.cookies.set("on-create-info", "show")
-            this.toggle()
-        } else if (this.showOnCreate === "show") {
-            this.toggle()
-        }
+        // this.showOnCreate = this.cookies.get("on-create-info")
+        // if (!this.showOnCreate) {
+        //     this.cookies.set("on-create-info", "show")
+        //     this.toggle()
+        // } else if (this.showOnCreate === "show") {
+        //     this.toggle()
+        // }
         this.ea.subscribe("keyboard-event", event => {
             if (event === "escape" && this.isVisible) {
                 this.toggle()

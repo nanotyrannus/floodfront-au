@@ -52,6 +52,12 @@
     padding: 1vh 1vw 1vh 1vw;
 }
 
+@media (min-width: 300px) {
+    .marker-menu-container {
+        height: 70vh;
+    }
+}
+
 .marker-menu-button {
     color: white;
     background-color: #4c97ba;
