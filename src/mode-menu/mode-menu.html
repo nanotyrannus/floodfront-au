@@ -1,9 +1,12 @@
 <template>
     <require from="./mode-menu.css"></require>
     <div class="container">
-        <div class="mode-title">
-            <h1>Logged in as ${ email }. Where are you?</h1>
+        <div class="row mode-title-row">
+            <div class="mode-title">
+                <h1>Logged in as ${ email }. Where are you?</h1>
+            </div>
         </div>
+
         <a role="button" class="btn btn-info mode-button btn-block btn-lg" click.delegate="enterMap('field')">
             <span>Out in the Field</span>
         </a>

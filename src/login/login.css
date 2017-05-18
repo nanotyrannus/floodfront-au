@@ -3,9 +3,8 @@ input[type="text"] {
 }
 
 .login-banner {
-    height: 35vh;
-    padding-right: 17vw;
-    padding-left: 17vw;
+    /*max-height: 30vw;*/
+    /*width: 70vw;*/
     /*background-size: contain;
     background-repeat: no-repeat;
     background-position: 50% 50%;
@@ -13,12 +12,14 @@ input[type="text"] {
 }
 
 .login-image {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
+    /*height: 30vw;*/
+    height: 30vw;
+    display: block;
+    margin:auto;
+    /*background-size: cover;
     background-repeat: no-repeat;
     background-position: 78% 66%;
-    background-image: url('assets/images/Floodfront_map_flooded_markers.png');
+    background-image: url('assets/images/Floodfront_map_flooded_markers.png');*/
 }
 
 .login-title {
@@ -44,4 +45,16 @@ input[type="text"] {
 
 .login-input-row {
     height: 33vh;
+}
+
+@media (min-width: 300px) {
+    .login-image {
+        height: 35vw;
+    }
+}
+
+@media (min-width: 700px) {
+    .login-image {
+        height: 30vw;
+    }
 }

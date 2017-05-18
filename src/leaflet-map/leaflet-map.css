@@ -4,8 +4,8 @@
 
 .place-search-input-container {
     position: fixed;
-    top: 3%;
-    left: 3%;
+    top: 20px;
+    left: 10px;
     z-index: 1002;
     /*background-color: white;*/
 }
@@ -13,7 +13,7 @@
 .map-switch {
     position: fixed;
     top: 20px;
-    right: 20px;
+    right: 10px;
     width: 75px;
     height: 75px;
     background-color: white;
@@ -90,6 +90,7 @@
 }
 
 .location-button {
+    font-size: 1em;
     /*bottom: 12%;*/
     /*right: 10px;*/
     width: 4em;

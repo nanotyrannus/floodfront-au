@@ -5,6 +5,14 @@
     padding: 3%;
 }
 
+.mode-button-row {
+    /*height: 60vh;*/
+}
+
+.mode-title-row {
+    height: 35vh;
+}
+
 .mode-button {
     /*margin: 3%;*/
     font-size: 2.5em;
