@@ -256,14 +256,18 @@ export class LeafletMap {
             // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 19,
             id: 'your.mapbox.project.id',
-            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
+            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw',
+            useCache: true,
+            crossOrigin: true
         })
 
         let satelliteLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/ciye7ibx9000l2sk6v4n5bx3n/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
             // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 19,
             id: 'your.mapbox.project.id',
-            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw'
+            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw',
+            useCache: true,
+            crossOrigin: true
         })
 
         let baseMaps = {
@@ -294,6 +298,14 @@ export class LeafletMap {
         // L.control.layers(baseMaps).addTo(this.leafletMap)
 
         // this.initiateNavigation
+
+        this.leafletMap.on("tilecachehit", event => {
+            console.warn("Cache hit!")
+        })
+
+        this.leafletMap.on("tilecachemiss", event => {
+            console.warn("Cache miss!")
+        })
 
         this.leafletMap.on("moveend", event => {
             // console.log(`moveend event`, event)
@@ -393,7 +405,7 @@ export class LeafletMap {
         </form>
         <button class="btn btn-default context-btn" onclick="window.leafletComponent.openNote()">Note</button>
         <button class="btn btn-default context-btn" onclick="window.leafletComponent.deleteMarker()">Delete</button>
-        <!-- <button class="btn btn-default" onclick="window.leafletComponent.upload(${marker.id})">UPLOAD</button> -->
+        <button class="btn btn-default" onclick="window.leafletComponent.upload(${marker.id})">UPLOAD</button>
     `
         // if (marker.type === MarkerType.DIRECTIONAL) {
         //   markup += `<div>I'M DIRECTIONAL</div>`
@@ -437,6 +449,14 @@ export class LeafletMap {
         let xhr = new XMLHttpRequest()
         xhr.open("POST", `${"https:"}//${"floodfront.net"}:8080/upload`)
         xhr.send(formData)
+        xhr.addEventListener("progress", (event) => {
+            if (event.lengthComputable) {
+                let percent = event.loaded / event.total
+                console.log(`${percent}% uploaded.`)
+            } else {
+                console.log(`Progress not computable.`)
+            }
+        })
         xhr.addEventListener("loadend", () => {
             this.selectedMarker.closePopup()
         })

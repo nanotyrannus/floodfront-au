@@ -73,8 +73,8 @@
           "stub": true
         }
       ],
-      "config" : {
-        "waitSeconds" : 999
+      "config": {
+        "waitSeconds": 999
       }
     },
     "options": {
@@ -168,7 +168,14 @@
             "resources": [
               "build/please-wait.css"
             ]
-          }
+          },
+          {
+            "name": "pouchdb",
+            "main": "dist/pouchdb.js",
+            "path": "../node_modules/pouchdb",
+            "resources": []
+          },
+          "leaflet.tilelayer.pouchdbcached"
         ]
       }
     ]
