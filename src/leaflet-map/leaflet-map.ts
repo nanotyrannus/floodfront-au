@@ -251,13 +251,16 @@ export class LeafletMap {
             (layer as any).bringToFront()
         })
 
+        let harveyTileLayer = L.tileLayer("https://stormscdn.ngs.noaa.gov/20170827-rgb/{z}/{x}/{y}", {tileSize: 256, minZoom: 1, maxZoom: 19, type: 'xyz'})
+        let harveyLayer = L.layerGroup([harveyTileLayer])
+
         // L.control.layers(null, { "Matthew": matthewLayer }).addTo(this.leafletMap)
         let simpleLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/cj0kywrdm001n2smyhddxb7wb/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
             // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 19,
             id: 'your.mapbox.project.id',
             accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw',
-            useCache: true,
+            // useCache: true,
             crossOrigin: true
         })
 
@@ -276,11 +279,13 @@ export class LeafletMap {
         }
 
         let overlayMaps = {
-            "Matthew": matthewLayer
+            "Matthew": matthewLayer,
+            "Harvey": harveyLayer
         }
         if (this.userService.mode === "desktop") {
             simpleLayer.addTo(this.leafletMap)
             matthewLayer.addTo(this.leafletMap)
+            harveyLayer.addTo(this.leafletMap)
         } else {
             satelliteLayer.addTo(this.leafletMap)
         }
