@@ -1,0 +1,10 @@
+<template>
+    <require from="./side-menu.css"></require>
+    <div class="side-menu-container" css="left:${leftMargin}%">
+        <button class="btn btn-default btn-block btn-lg" click.delegate="showSearch()">
+                Search Map <span class="glyphicon glyphicon-search"></span>
+        </button>
+        <button class="btn btn-default btn-block btn-lg" click.delegate="seedMap()">Download Current Area</button>
+        <button class="btn btn-warning btn-block btn-lg" click.delegate="clearCache()">Clear Downloaded Map</button>
+    </div>
+</template>

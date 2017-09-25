@@ -1,0 +1,11 @@
+.side-menu-container {
+    height: 100%;
+    width: 70%;
+    top: 0px;
+    left: 0%;
+    background-color: #227Bff;
+    z-index: 402;
+    position: fixed;
+    transition: left 0.2s;
+    padding: 15px;
+}

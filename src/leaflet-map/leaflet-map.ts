@@ -11,7 +11,10 @@ import { EventAggregator } from "aurelia-event-aggregator"
 import { InformationCustomElement } from "../resources/elements/information"
 import { SearchCustomElement } from "../resources/elements/search/search"
 import { MatthewFilterCustomElement } from "../resources/elements/matthew-filter/matthew-filter"
+import { SideMenuCustomElement } from "../resources/elements/side-menu/side-menu"
 import { child } from "aurelia-framework"
+import * as Hammer from "hammerjs"
+import { TileLayerCache } from "../leaflet-extensions/tile-layer-cache"
 
 @autoinject
 export class LeafletMap {
@@ -50,6 +53,22 @@ export class LeafletMap {
             })
         })
 
+        this.eventAggregator.subscribe('search-event', () => {
+            this.showSearch()
+        })
+
+        this.eventAggregator.subscribe('cache-event', which => {
+            if (which === "seed") {
+                this.seedMap()
+            } else if (which === "clear"){
+                this.clearCache()
+            }
+
+        })
+
+        new TileLayerCache()
+
+
         this.getMarkers()
     }
 
@@ -85,7 +104,20 @@ export class LeafletMap {
         this.nav.initialize()
         this.configureMap()
 
+        var hammer = new Hammer(window.document.body)
+        hammer.on('swipeleft', () => {
+            this.eventAggregator.publish('swipe-event', "left")
+        })
 
+        hammer.on('swiperight', (e) => {
+            var endPoint = e.pointers[0].pageX;
+            var distance = e.distance;
+            var origin = endPoint - distance;
+            if (origin <= 30) {
+                this.eventAggregator.publish('swipe-event', "right")
+            }
+        })
+        hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL })
     }
 
     private spawnMarker(latlng: any, type: MarkerType = null, oldMarker: any = null) {
@@ -251,7 +283,7 @@ export class LeafletMap {
             (layer as any).bringToFront()
         })
 
-        let harveyTileLayer = L.tileLayer("https://stormscdn.ngs.noaa.gov/20170827-rgb/{z}/{x}/{y}", {tileSize: 256, minZoom: 1, maxZoom: 19, type: 'xyz'})
+        let harveyTileLayer = L.tileLayer("https://stormscdn.ngs.noaa.gov/20170827-rgb/{z}/{x}/{y}", { tileSize: 256, minZoom: 1, maxZoom: 19, type: 'xyz' })
         let harveyLayer = L.layerGroup([harveyTileLayer])
 
         // L.control.layers(null, { "Matthew": matthewLayer }).addTo(this.leafletMap)
@@ -264,14 +296,18 @@ export class LeafletMap {
             crossOrigin: true
         })
 
-        let satelliteLayer = L.tileLayer('https://api.mapbox.com/styles/v1/nanotyrannus/ciye7ibx9000l2sk6v4n5bx3n/tiles/256/{z}/{x}/{y}@2x?access_token={accessToken}', {
+        let satelliteLayer = L.tileLayer('https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.jpg70?access_token={accessToken}', {
             // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 19,
             id: 'your.mapbox.project.id',
             accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw',
-            useCache: true,
+            // useCache: true,
             crossOrigin: true
         })
+
+        // satelliteLayer.destroy()
+        // satelliteLayer.on('tilecache-hit', ()=>{ console.log("tilecache hit")})
+        // satelliteLayer.on('tilecache-miss', () => { console.log("tilecache miss")})
 
         let baseMaps = {
             "Map": simpleLayer,
@@ -314,6 +350,14 @@ export class LeafletMap {
 
         this.leafletMap.on("moveend", event => {
             // console.log(`moveend event`, event)
+            let bbox = this.leafletMap.getBounds()
+            let sw = bbox.getSouthWest()
+            let se = bbox.getSouthEast()
+            let ne = bbox.getNorthEast()
+            let nw = bbox.getNorthWest()
+            let width = this.leafletMap.distance(sw, se)/1000
+            let height = this.leafletMap.distance(ne, se)/1000
+            console.log(`Zoom level: ${event.target._zoom}, area: ${width * height} km^2`)
             this.cookie.set("last_location", JSON.stringify(this.getCenter()))
         })
         this.leafletMap.on("dragstart", event => {
@@ -328,9 +372,9 @@ export class LeafletMap {
             this.cookie.set("last_location", JSON.stringify(center))
         })
 
-        this.leafletMap.on("zoomend", (event => {
+        this.leafletMap.on("zoomend", (event: any) => {
             this.cookie.set("last_zoom_level", `${this.leafletMap.getZoom()}`)
-        }))
+        })
 
         this.leafletMap.on('click', (event: any) => {
 
@@ -445,6 +489,26 @@ export class LeafletMap {
         reader.readAsDataURL(value.files[0])
         this.files.set(markerId, value.files[0])
         this.upload(markerId)
+    }
+
+    public seedMap() {
+        this.satelliteLayer.seed(this.leafletMap.getBounds(), 10, 19)
+        // this.satelliteLayer.on('seedstart', event => {
+        //     console.log("seedstart", event)
+        // })
+        // this.satelliteLayer.on('seedend', event => {
+        //     console.log("seedend", event)
+        // })
+        // this.satelliteLayer.on('seedprogress', event => {
+        //     console.log("seedprogress", event)
+        // })
+        this.satelliteLayer.on('tilecachehit', event => {
+            console.log(`HIT`)
+        })
+    }
+
+    public clearCache() {
+        this.satelliteLayer.clearCache()
     }
 
     private upload(markerId: number) {

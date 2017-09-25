@@ -169,13 +169,13 @@
               "build/please-wait.css"
             ]
           },
+          "hammerjs",
           {
-            "name": "pouchdb",
-            "main": "dist/pouchdb.js",
-            "path": "../node_modules/pouchdb",
+            "name": "rx",
+            "main": "index.js",
+            "path": "../node_modules/rx",
             "resources": []
-          },
-          "leaflet.tilelayer.pouchdbcached"
+          }
         ]
       }
     ]
