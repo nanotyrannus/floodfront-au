@@ -12,9 +12,12 @@ import { InformationCustomElement } from "../resources/elements/information"
 import { SearchCustomElement } from "../resources/elements/search/search"
 import { MatthewFilterCustomElement } from "../resources/elements/matthew-filter/matthew-filter"
 import { SideMenuCustomElement } from "../resources/elements/side-menu/side-menu"
+import { ModalDialogCustomElement } from "../resources/elements/modal-dialog/modal-dialog"
 import { child } from "aurelia-framework"
 import * as Hammer from "hammerjs"
 import { TileLayerCache } from "../leaflet-extensions/tile-layer-cache"
+import { polygon } from "../turf/helpers"
+import { union } from "../turf/union"
 
 @autoinject
 export class LeafletMap {
@@ -30,11 +33,14 @@ export class LeafletMap {
     private isSatelliteLayer: boolean
     private simpleLayer: any
     private satelliteLayer: any
+    private cachedAreas: Array<Array<number>>
+    private cachedAreaPolygon: L.LayerGroup
     @child('information') private info: InformationCustomElement
     @child('search') private search: SearchCustomElement
     @child('matthew-filter') private matthew: MatthewFilterCustomElement
 
     constructor(
+        private cache: TileLayerCache,
         private router: Router,
         private rest: RestService,
         private userService: UserService,
@@ -43,6 +49,7 @@ export class LeafletMap {
         private eventAggregator: EventAggregator,
         private nav: NavigationService,
         private cookie: CookieService) {
+
 
         this.eventAggregator.subscribe("marker-note", data => {
             console.log(data)
@@ -60,14 +67,28 @@ export class LeafletMap {
         this.eventAggregator.subscribe('cache-event', which => {
             if (which === "seed") {
                 this.seedMap()
-            } else if (which === "clear"){
+            } else if (which === "clear") {
                 this.clearCache()
             }
 
         })
 
-        new TileLayerCache()
+        this.cachedAreas = new Array<Array<number>>()
 
+
+        this.cachedAreaPolygon = new L.LayerGroup([L.polygon([[0, 0]])])
+        this.eventAggregator.subscribe('tilecache-area', evt => {
+            this.cachedAreas.push(evt.polygon)
+            let polygons = []
+            this.cachedAreas.forEach(latlng => {
+                polygons.push(polygon(latlng))
+            })
+            this.cachedAreaPolygon.clearLayers()
+            let reduced = union(...polygons)
+            let unioned = L.geoJSON(reduced, { style: function () { return { color: "#ff0083", fillOpacity: 0, opacity: 0.6 } } })
+            this.cachedAreaPolygon.addLayer(unioned)
+            this.cachedAreaPolygon.addTo(this.leafletMap)
+        })
 
         this.getMarkers()
     }
@@ -300,7 +321,8 @@ export class LeafletMap {
             // attribution: 'Map data &copy; OpenStreetMap contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
             maxZoom: 19,
             id: 'your.mapbox.project.id',
-            accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw',
+            accessToken: 'pk.eyJ1IjoibWVnYXByb3RvZG9uIiwiYSI6ImNqODAzd3VtbTF6OXMzM3M2b2FzemV0ZGQifQ.IODqCZYCvs2KPqfIcEaeGA',
+            // accessToken: 'pk.eyJ1IjoibmFub3R5cmFubnVzIiwiYSI6ImNpcnJtMmNubDBpZTN0N25rZmMxaHg4ZHQifQ.vj7pif8Z4BVhbYs55s1tAw',
             // useCache: true,
             crossOrigin: true
         })
@@ -355,8 +377,8 @@ export class LeafletMap {
             let se = bbox.getSouthEast()
             let ne = bbox.getNorthEast()
             let nw = bbox.getNorthWest()
-            let width = this.leafletMap.distance(sw, se)/1000
-            let height = this.leafletMap.distance(ne, se)/1000
+            let width = this.leafletMap.distance(sw, se) / 1000
+            let height = this.leafletMap.distance(ne, se) / 1000
             console.log(`Zoom level: ${event.target._zoom}, area: ${width * height} km^2`)
             this.cookie.set("last_location", JSON.stringify(this.getCenter()))
         })
@@ -441,6 +463,8 @@ export class LeafletMap {
         // let data = response.content
         console.log("leaflet-map#createMarker", response)
         marker.id = response.id
+        marker.unbindPopup()
+        this.bindPopup(marker, type)
     }
 
     public bindPopup(marker: any, type: MarkerType = MarkerType.WALKABLE) {
@@ -488,7 +512,7 @@ export class LeafletMap {
         }
         reader.readAsDataURL(value.files[0])
         this.files.set(markerId, value.files[0])
-        this.upload(markerId)
+        // this.upload(markerId)
     }
 
     public seedMap() {
@@ -512,13 +536,13 @@ export class LeafletMap {
     }
 
     private upload(markerId: number) {
+        console.log(`upload() markerId: ${markerId}`)
         let formData = new FormData()
         formData.append("image", this.files.get(markerId))
         formData.append("marker_id", String(markerId))
         let xhr = new XMLHttpRequest()
         xhr.open("POST", `${"https:"}//${"floodfront.net"}:8080/upload`)
-        xhr.send(formData)
-        xhr.addEventListener("progress", (event) => {
+        xhr.upload.addEventListener("progress", (event) => {
             if (event.lengthComputable) {
                 let percent = event.loaded / event.total
                 console.log(`${percent}% uploaded.`)
@@ -526,6 +550,7 @@ export class LeafletMap {
                 console.log(`Progress not computable.`)
             }
         })
+        xhr.send(formData)
         xhr.addEventListener("loadend", () => {
             this.selectedMarker.closePopup()
         })

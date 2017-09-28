@@ -175,7 +175,8 @@
             "main": "index.js",
             "path": "../node_modules/rx",
             "resources": []
-          }
+          },
+          "jsts"
         ]
       }
     ]

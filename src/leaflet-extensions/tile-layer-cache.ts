@@ -6,49 +6,73 @@ import { autoinject } from "aurelia-framework"
 
 @autoinject
 export class TileLayerCache {
+    saveToCache: any;
+    useOnlyCache: any;
+    cacheFormat: any;
+    cacheMaxAge: any;
+    useCache: boolean;
+
+    private db: PouchDB.Database<any>
 
     constructor(public ea: EventAggregator) {
-        L.TileLayer.addInitHook(function () {
-
-            // if (!this.options.useCache) {
-            //     this._db = null;
-            //     this._canvas = null;
-            //     return;
-            // }
-
-            this._db = new PouchDB('offline-tiles');
-            window.db = this._db
-            this._canvas = document.createElement('canvas');
-
-            if (!(this._canvas.getContext && this._canvas.getContext('2d'))) {
-                // HTML5 canvas is needed to pack the tiles as base64 data. If
-                //   the browser doesn't support canvas, the code will forcefully
-                //   skip caching the tiles.
-                this._canvas = null;
+        this.ea.subscribe('tilecache', evt => {
+            if (evt.hit) {
+                console.log(`Cache  HIT!`)
+            } else {
+                console.log(`Cache MISS!`)
             }
         })
+        this.db = new PouchDB('offline-tiles')
+        L.TileLayer.addInitHook(function (db, ea) {
+            return function () {
+
+                // if (!this.options.useCache) {
+                //     this._db = null;
+                //     this._canvas = null;
+                //     return;
+                // }
+
+                // this._db = new PouchDB('offline-tiles');
+                this._db = db
+                this._ea = ea
+                window.db = this._db
+                this._canvas = document.createElement('canvas');
+
+                if (!(this._canvas.getContext && this._canvas.getContext('2d'))) {
+                    // HTML5 canvas is needed to pack the tiles as base64 data. If
+                    //   the browser doesn't support canvas, the code will forcefully
+                    //   skip caching the tiles.
+                    this._canvas = null;
+                }
+            }
+        }(this.db, this.ea))
 
         // 🍂namespace TileLayer
         // 🍂section PouchDB tile caching options
         // 🍂option useCache: Boolean = false
         // Whether to use a PouchDB cache on this tile layer, or not
         L.TileLayer.prototype.options.useCache = false;
+        this.useCache = false
 
         // 🍂option saveToCache: Boolean = true
         // When caching is enabled, whether to save new tiles to the cache or not
         L.TileLayer.prototype.options.saveToCache = true;
+        this.saveToCache = true
 
         // 🍂option useOnlyCache: Boolean = false
         // When caching is enabled, whether to request new tiles from the network or not
         L.TileLayer.prototype.options.useOnlyCache = false;
+        this.useOnlyCache = false
 
         // 🍂option useCache: String = 'image/png'
         // The image format to be used when saving the tile images in the cache
         L.TileLayer.prototype.options.cacheFormat = 'image/jpg';
+        this.cacheFormat = 'image/jpg'
 
         // 🍂option cacheMaxAge: Number = 24*3600*1000
         // Maximum age of the cache, in milliseconds
         L.TileLayer.prototype.options.cacheMaxAge = 24 * 3600 * 1000;
+        this.cacheMaxAge = 24 * 3600 * 1000
 
         L.TileLayer.include({
 
@@ -162,16 +186,22 @@ export class TileLayerCache {
                     this._db.remove(tileUrl, existingRevision);
                 }
 
+                let failed = false
+                let attempts = 3
 
-                this._db.put({
-                    _id: tileUrl,
-                    dataUrl: dataUrl,
-                    timestamp: doc.timestamp
-                }, (err, response) => {
-                    if (err) {
-                        console.log(err)
-                    }
-                })
+                do {
+                    this._db.put({
+                        _id: tileUrl,
+                        dataUrl: dataUrl,
+                        timestamp: doc.timestamp
+                    }, (err, response) => {
+                        if (err) {
+                            console.error(err)
+                            failed = true
+                            attempts--
+                        }
+                    })
+                } while (failed && (attempts > 0))
 
                 if (done) { done(); }
             },
@@ -186,6 +216,14 @@ export class TileLayerCache {
                 if (!this._map) return;
 
                 var queue = [];
+
+                let ne = bbox.getNorthEast()
+                let nw = bbox.getNorthWest()
+                let sw = bbox.getSouthWest()
+                let se = bbox.getSouthEast()
+
+                this._seedingArea = [[[ne.lng, ne.lat], [nw.lng, nw.lat], [sw.lng, sw.lat], [se.lng, se.lat], [ne.lng, ne.lat]]]
+
 
                 for (var z = minZoom; z <= maxZoom; z++) {
 
@@ -244,18 +282,22 @@ export class TileLayerCache {
             _seedingInProgress: false,
             _seedingTotal: 0,
             _seedingCurrent: 0,
+            _seedingArea: null,
 
             _onSeedingDone: function () {
                 this._seedingInProgress = false
                 this._seedingTotal = 0
                 this._seedingCurrent = 0
+                this._ea.publish('loading-indicator', false)
+                this._ea.publish('tilecache-area', { polygon: this._seedingArea })
             },
 
-            _seedAll: async function (tileUrls) {
+            _seedAll: function (tileUrls) {
                 if (this._seedingInProgress) {
                     console.warn("Already seeding!")
                     return
                 }
+
                 this._seedingTotal = tileUrls.length
                 this._seedingInProgress = true
 
@@ -304,7 +346,7 @@ export class TileLayerCache {
                                         tile.onload = function (evt) {
                                             this._saveTile(tile, url, null)
                                             this._seedingCurrent++
-                                            this.ea.publish('loading-indicator-progress', Math.ceil(this._seedingCurrent / this._seedingTotal))
+                                            this._ea.publish('loading-indicator-progress', Math.ceil(this._seedingCurrent / this._seedingTotal * 100))
                                             if (this._seedingCurrent === this._seedingTotal) {
                                                 console.log(`Seeding complete.`)
                                                 this._onSeedingDone()
@@ -438,4 +480,5 @@ export class TileLayerCache {
         });
 
     }
+
 }

@@ -17,7 +17,7 @@ export class App {
     console.log("Main component created!")
     window.loading_screen.finish()
     window.addEventListener("keydown", event => {
-      console.log(event)
+      // console.log(event)
       if (event.ctrlKey && event.which === 70) {
         this.ea.publish("keyboard-event", "find")
         event.preventDefault()

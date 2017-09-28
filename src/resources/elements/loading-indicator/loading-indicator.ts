@@ -17,6 +17,10 @@ export class LoadingIndicatorCustomElement {
             }
         })
         ea.subscribe("loading-indicator-progress", (value: number) => {
+            console.log(`loading-indicator-progress ${value}`)
+            if (this.opacity === 0) {
+                this.opacity = 1
+            }
             this.progress = value
         })
     }
