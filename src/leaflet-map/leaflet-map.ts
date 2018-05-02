@@ -472,8 +472,8 @@ export class LeafletMap {
         marker.unbindPopup()
         let id = marker.id
         let markup = `
-        <img id="thumbnail-${marker.id}" class="thumbnail map-thumbnail" src="/uploads/${marker.id}.jpg">
-        <form enctype="multipart/form-data" action="https://localhost:8080/upload" method="POST">
+        <img id="thumbnail-${marker.id}" class="thumbnail map-thumbnail" src="/static/${marker.id}.jpg">
+        <form enctype="multipart/form-data" action="https://localhost/upload" method="POST">
         <input style="display: inline;" class="filestyle" data-iconName="glyphicon glyphicon-camera" type="file" name="picture" accept="image/*" onchange="window.leafletComponent.readUrl(this, ${marker.id})">
         </form>
         <button class="btn btn-default context-btn" onclick="window.leafletComponent.openNote()">Note</button>
@@ -488,7 +488,11 @@ export class LeafletMap {
 
     public updateMarker(id: number, latlng: any, heading: number = null) {
         console.log(`updateMarker called with ${id} ${heading}`, latlng)
-        this.rest.postWithRetry(`/marker/${id}/update`, {
+        if (!id) {
+            console.warn("Race condition: marker's ID is undefined before update.")
+            return
+        }
+        this.rest.postWithRetry(`marker/${id}/update`, {
             "lat": latlng.lat,
             "lon": latlng.lng,
             "heading": heading
@@ -541,7 +545,7 @@ export class LeafletMap {
         formData.append("image", this.files.get(markerId))
         formData.append("marker_id", String(markerId))
         let xhr = new XMLHttpRequest()
-        xhr.open("POST", `${"https:"}//${"floodfront.net"}:8080/upload`)
+        xhr.open("POST", `${"https:"}//${window.location.hostname}/upload`)
         xhr.upload.addEventListener("progress", (event) => {
             if (event.lengthComputable) {
                 let percent = event.loaded / event.total

@@ -5,14 +5,14 @@ import { EventAggregator } from "aurelia-event-aggregator"
 @autoinject()
 export class RestService {
     private _client: HttpClient
-    private baseUrl = `${"https"}//${"floodfront.net"}:${8080}`
+    private baseUrl = `https://${window.location.hostname}`
     private inProgress = new Map()
     private activeRequests = 0
 
     constructor(private ea: EventAggregator) {
         console.log(`RestService constructed!`)
         this._client = new HttpClient().configure(x => {
-            x.withBaseUrl("https://floodfront.net:8080")
+            x.withBaseUrl(this.baseUrl)
         })
     }
 
