@@ -2,17 +2,20 @@ import { autoinject } from "aurelia-framework"
 import { HttpClient } from "aurelia-http-client"
 import { EventAggregator } from "aurelia-event-aggregator"
 
+declare let window: any
+
 @autoinject()
 export class RestService {
     private _client: HttpClient
-    private baseUrl = `${"https"}//${"floodfront.net"}:${8080}`
+    private baseUrl = `${"https:"}//${window.location.hostname}:${8080}`
     private inProgress = new Map()
     private activeRequests = 0
 
     constructor(private ea: EventAggregator) {
         console.log(`RestService constructed!`)
         this._client = new HttpClient().configure(x => {
-            x.withBaseUrl("https://floodfront.net:8080")
+            // x.withBaseUrl("https://floodfront.net:8080")
+            x.withBaseUrl(this.baseUrl)
         })
     }
 
@@ -53,7 +56,7 @@ export class RestService {
     public async post(endpoint: string, body: any) {
         let response = null
         let data = null
-        response = await this._client.post(`${endpoint}`, body)
+        response = await this._client.post(`${this.baseUrl}/${endpoint}`, body)
         data = response.content
         return data
     }

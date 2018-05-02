@@ -487,8 +487,10 @@ export class LeafletMap {
     }
 
     public updateMarker(id: number, latlng: any, heading: number = null) {
+        let callString = `marker/${id}/update`
         console.log(`updateMarker called with ${id} ${heading}`, latlng)
-        this.rest.postWithRetry(`/marker/${id}/update`, {
+        console.log(`Call string: ${callString}`)
+        this.rest.postWithRetry(callString, {
             "lat": latlng.lat,
             "lon": latlng.lng,
             "heading": heading
