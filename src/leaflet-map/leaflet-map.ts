@@ -139,6 +139,11 @@ export class LeafletMap {
             }
         })
         hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL })
+
+        var mapSwitch = new Hammer(document.querySelectorAll(".map-switch")[0] as HTMLElement)
+        mapSwitch.on('tap', () => {
+            this.toggleBaseMap()
+        })
     }
 
     private spawnMarker(latlng: any, type: MarkerType = null, oldMarker: any = null) {
