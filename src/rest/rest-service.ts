@@ -7,7 +7,8 @@ declare let window: any
 @autoinject()
 export class RestService {
     private _client: HttpClient
-    private baseUrl = `${"https:"}//${window.location.hostname}:${8080}`
+    //private baseUrl = `${"https:"}//${window.location.hostname}:${8080}`
+    private baseUrl = `${"https:"}//${window.location.hostname}/api`
     private inProgress = new Map()
     private activeRequests = 0
 
